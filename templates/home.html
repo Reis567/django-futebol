@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Bem-vindo à página principal!</h1>
+
+    <h2>Times</h2>
+    <ul>
+        {% for time in times %}
+            <li>{{ time.nome }}</li>
+        {% empty %}
+            <li>Não há times cadastrados.</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Partidas Já Transmitidas</h2>
+    <ul>
+        {% for partida in partidas %}
+            <li>{{ partida.time_casa.nome }} {{ partida.placar_casa }} x {{ partida.placar_visitante }} {{ partida.time_visitante.nome }} - Competição: {{ partida.competicao.nome }}</li>
+        {% empty %}
+            <li>Não há partidas transmitidas até o momento.</li>
+        {% endfor %}
+    </ul>
+
+    <button type="button" onclick="location.href='{% url 'iniciar_transmissao' %}'">Iniciar Transmissão</button>
+{% endblock %}
