@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Paleta de cores */
+:root {
+    --primary-color: #2e1a17; /* Marrom escuro */
+    --secondary-color: #795548; /* Marrom médio */
+    --accent-color: #f3ebe8; /* Marrom claro */
+}
+
+/* Estilos gerais */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+.div-content{
+    min-height: 100vh;
+}
+.navbar{
+    background-color:    var(--primary-color);
+}
+.footer{
+    background-color:    var(--primary-color);  
+}
