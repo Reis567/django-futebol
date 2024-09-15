@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import *
 from django.shortcuts import redirect
 from django.db.models import Count, Q
@@ -45,6 +45,15 @@ def selecionar_partida(request):
 
 
 
-def iniciar_transmissao(request):
-    # Aqui você pode adicionar a lógica para iniciar a transmissão.
-    return redirect('home')
+def transmissao_partida(request, partida_id):
+    partida = get_object_or_404(Partida, id=partida_id)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'iniciar':
+            partida.tempo_paralisado = False
+        elif action == 'pausar':
+            partida.tempo_paralisado = True
+        partida.save()
+
+    return render(request, 'transmissao_partida.html', {'partida': partida})
