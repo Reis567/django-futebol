@@ -54,8 +54,6 @@ class Competicao(models.Model):
 
     def __str__(self):
         return self.nome
-
-# Modelo para Partida
 class Partida(models.Model):
     time_casa = models.ForeignKey(Time, related_name='time_casa', on_delete=models.CASCADE)
     time_visitante = models.ForeignKey(Time, related_name='time_visitante', on_delete=models.CASCADE)
@@ -64,16 +62,6 @@ class Partida(models.Model):
     
     # Adicionando a relação com Competição
     competicao = models.ForeignKey(Competicao, on_delete=models.CASCADE, related_name='partidas')
-
-    # Tempo de Jogo
-    tempo_primeiro_tempo = models.DurationField(default=timedelta(minutes=45))
-    acrescimo_primeiro_tempo = models.DurationField(default=timedelta(minutes=0))
-    tempo_segundo_tempo = models.DurationField(default=timedelta(minutes=45))
-    acrescimo_segundo_tempo = models.DurationField(default=timedelta(minutes=0))
-
-    # Controle de tempo
-    tempo_jogo_total = models.DurationField(default=timedelta(minutes=0))
-    tempo_paralisado = models.BooleanField(default=False)
 
     # Status da Partida
     STATUS_PARTIDA = [
@@ -89,17 +77,6 @@ class Partida(models.Model):
 
     def incrementar_placar_visitante(self):
         self.placar_visitante += 1
-
-    def resetar_tempo(self):
-        self.tempo_jogo_total = timedelta(minutes=0)
-
-    def pausar_jogo(self):
-        self.tempo_paralisado = True
-        self.status = 'PARALISADA'
-
-    def retomar_jogo(self):
-        self.tempo_paralisado = False
-        self.status = 'EM_ANDAMENTO'
 
     def encerrar_jogo(self):
         self.status = 'FINALIZADA'

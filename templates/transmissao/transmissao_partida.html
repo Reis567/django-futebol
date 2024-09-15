@@ -1,17 +1,144 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>Transmissão de {{ partida.time_casa.nome }} vs {{ partida.time_visitante.nome }}</h1>
-    <h2>Competição: {{ partida.competicao.nome }}</h2>
+<style>
+    .transmissao-container {
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        gap: 20px;
+        padding: 20px;
+        height: 100vh;
+    }
 
-    <p>Status: {{ partida.get_status_display }}</p>
-    <p>Placar: {{ partida.time_casa.nome }} {{ partida.placar_casa }} x {{ partida.placar_visitante }} {{ partida.time_visitante.nome }}</p>
+    .time {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+    }
 
-    <form method="post">
-        {% csrf_token %}
-        {% if partida.tempo_paralisado %}
-            <button type="submit" name="action" value="iniciar" class="btn btn-success">Iniciar Cronômetro</button>
-        {% else %}
-            <button type="submit" name="action" value="pausar" class="btn btn-warning">Pausar Cronômetro</button>
-        {% endif %}
-    </form>
+    .time h2 {
+        margin-bottom: 10px;
+    }
+
+    .jogadores {
+        list-style: none;
+        padding: 0;
+        text-align: left;
+    }
+
+    .jogadores li {
+        margin-bottom: 5px;
+    }
+
+    .placar {
+        grid-column: 2;
+        text-align: center;
+    }
+
+    .placar h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .cronometro {
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+
+    .webcams-container {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+    }
+
+    .webcam {
+        width: 45%;
+        height: 200px;
+        background-color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+    }
+
+    .patrocinadores {
+        grid-column: 1 / span 3;
+        text-align: center;
+        height: 100px;
+        background-color: #f2f2f2;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="transmissao-container">
+    <!-- Jogadores do Time da Casa -->
+    <div class="time time-casa">
+        <h2>{{ partida.time_casa.nome }}</h2>
+        <ul class="jogadores">
+            {% for jogador in partida.time_casa.jogadores_titulares.all %}
+                <li>{{ jogador.numero_camisa }} - {{ jogador.nome }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Placar e Cronômetro -->
+    <div class="placar">
+        <h1>{{ partida.time_casa.nome }} {{ partida.placar_casa }} x {{ partida.placar_visitante }} {{ partida.time_visitante.nome }}</h1>
+        <div class="cronometro" id="cronometro">00:00</div>
+    </div>
+
+    <!-- Jogadores do Time Visitante -->
+    <div class="time time-visitante">
+        <h2>{{ partida.time_visitante.nome }}</h2>
+        <ul class="jogadores">
+            {% for jogador in partida.time_visitante.jogadores_titulares.all %}
+                <li>{{ jogador.numero_camisa }} - {{ jogador.nome }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Webcams dos Narradores -->
+    <div class="webcams-container">
+        <div class="webcam" id="webcam1">Webcam 1</div>
+        <div class="webcam" id="webcam2">Webcam 2</div>
+    </div>
+
+    <!-- Container para Patrocinadores -->
+    <div class="patrocinadores">
+        <p>Patrocinadores</p>
+    </div>
+</div>
+
+<script>
+    let cronometroAtivo = false;
+    let segundos = 0;
+    let intervalo;
+
+    // Função para formatar o cronômetro
+    function formatarTempo(segundos) {
+        const minutos = Math.floor(segundos / 60);
+        const segundosRestantes = segundos % 60;
+        return `${minutos.toString().padStart(2, '0')}:${segundosRestantes.toString().padStart(2, '0')}`;
+    }
+
+    // Função para iniciar/pausar o cronômetro
+    function controlarCronometro() {
+        if (cronometroAtivo) {
+            clearInterval(intervalo);
+        } else {
+            intervalo = setInterval(() => {
+                segundos++;
+                document.getElementById('cronometro').innerText = formatarTempo(segundos);
+            }, 1000);
+        }
+        cronometroAtivo = !cronometroAtivo;
+    }
+
+    // Listener para Control + Page Up para controlar o cronômetro
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.key === 'insert') {
+            controlarCronometro();
+        }
+    });
+</script>
 {% endblock %}

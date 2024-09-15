@@ -38,8 +38,6 @@ def selecionar_partida(request):
             time_casa_id=time_casa_id,
             time_visitante_id=time_visitante_id,
             competicao_id=competicao_id,
-            tempo_jogo_total=timedelta(minutes=0),  # Cronômetro zerado
-            tempo_paralisado=True,  # Partida pausada
             status='EM_ANDAMENTO'
         )
 
@@ -53,12 +51,6 @@ def selecionar_partida(request):
 def transmissao_partida(request, partida_id):
     partida = get_object_or_404(Partida, id=partida_id)
 
-    if request.method == 'POST':
-        action = request.POST.get('action')
-        if action == 'iniciar':
-            partida.tempo_paralisado = False
-        elif action == 'pausar':
-            partida.tempo_paralisado = True
-        partida.save()
+
 
     return render(request, 'transmissao/transmissao_partida.html', {'partida': partida})
