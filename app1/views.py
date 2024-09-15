@@ -6,16 +6,21 @@ from django.db.models import Count, Q
 
 
 def home(request):
-
+    # Contando corretamente os jogadores titulares e os do banco para cada time
     times = Time.objects.annotate(
-        num_jogadores=Count('jogador', filter=Q(jogador__isnull=False)), 
+        num_jogadores=Count('jogadores_titulares', distinct=True) + Count('jogadores_banco', distinct=True),
         num_partidas=Count(
             'time_casa', filter=Q(time_casa__status='FINALIZADA')
         ) + Count(
             'time_visitante', filter=Q(time_visitante__status='FINALIZADA')
         )
     )
-    
+    jogadores = Jogador.objects.all()
+    for jogador in jogadores:
+        print(jogador.nome)
+
+    for time in times:
+        print(f"Time: {time.nome} - Jogadores: {time.num_jogadores}")
     partidas = Partida.objects.filter(status='FINALIZADA')
     
     return render(request, 'home.html', {'times': times, 'partidas': partidas})
@@ -41,7 +46,7 @@ def selecionar_partida(request):
 
         return redirect('transmissao_partida', partida_id=partida.id)
 
-    return render(request, 'selecionar_partida.html', {'times': times, 'competicoes': competicoes})
+    return render(request, 'transmissao/selecionar_partida.html', {'times': times, 'competicoes': competicoes})
 
 
 
@@ -56,4 +61,4 @@ def transmissao_partida(request, partida_id):
             partida.tempo_paralisado = True
         partida.save()
 
-    return render(request, 'transmissao_partida.html', {'partida': partida})
+    return render(request, 'transmissao/transmissao_partida.html', {'partida': partida})

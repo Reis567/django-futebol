@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Transmissão de {{ partida.time_casa.nome }} vs {{ partida.time_visitante.nome }}</h1>
+    <h2>Competição: {{ partida.competicao.nome }}</h2>
+
+    <p>Status: {{ partida.get_status_display }}</p>
+    <p>Placar: {{ partida.time_casa.nome }} {{ partida.placar_casa }} x {{ partida.placar_visitante }} {{ partida.time_visitante.nome }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {% if partida.tempo_paralisado %}
+            <button type="submit" name="action" value="iniciar" class="btn btn-success">Iniciar Cronômetro</button>
+        {% else %}
+            <button type="submit" name="action" value="pausar" class="btn btn-warning">Pausar Cronômetro</button>
+        {% endif %}
+    </form>
+{% endblock %}
