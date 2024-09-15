@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Selecione os Times e a Competição</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="time_casa">Time Casa</label>
+            <select id="time_casa" name="time_casa" class="form-control">
+                {% for time in times %}
+                    <option value="{{ time.id }}">{{ time.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="time_visitante">Time Visitante</label>
+            <select id="time_visitante" name="time_visitante" class="form-control">
+                {% for time in times %}
+                    <option value="{{ time.id }}">{{ time.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="competicao">Competição</label>
+            <select id="competicao" name="competicao" class="form-control">
+                {% for competicao in competicoes %}
+                    <option value="{{ competicao.id }}">{{ competicao.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Iniciar Transmissão</button>
+    </form>
+{% endblock %}
