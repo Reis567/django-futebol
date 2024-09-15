@@ -44,9 +44,27 @@
         font-weight: bold;
     }
 
+    .central {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+    }
+
+    .periodo {
+        font-size: 1.5rem;
+        background-color: #8B4513; /* Marrom */
+        color: white;
+        padding: 3px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 5px;
+        width: 10%; /* Largura total */
+        text-align: center;
+    }
+
     .placar {
         text-align: center;
-        margin-bottom: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -89,7 +107,7 @@
         text-align: center;
         height: 300px;
         background-color: #f2f2f2;
-        margin-top: 20px;
+        margin-top: 5px;
     }
 
     .tecnico,
@@ -98,9 +116,13 @@
     }
 
     .competicao {
-        font-size: 1.8rem;
+        font-size: 1rem;
         text-align: center;
-        margin-top: 10px;
+        margin-block: 10px;
+        background-color: #8B4513; /* Marrom */
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
     }
 </style>
 
@@ -130,8 +152,8 @@
         </div>
     </div>
 
-    <!-- Coluna central: Placar, Cronômetro, Webcams e Patrocinadores -->
     <div class="central">
+        <div class="periodo" id="periodo">1T</div> <!-- Div para alternar o período -->
         <div class="placar">
             <h1>{{ partida.time_casa.sigla }} {{ partida.placar_casa }}</h1>
             <div class="cronometro" id="cronometro">00:00</div>
@@ -175,10 +197,18 @@
     </div>
 </div>
 
+
+
+
+
+
+<!-- TEMPOS -->
 <script>
     let cronometroAtivo = false;
     let segundos = 0;
     let intervalo;
+    const periodos = ['1T', '2T', '1TP', '2TP', 'PEN']; // Array de períodos
+    let indicePeriodo = 0; // Índice atual do período
 
     // Função para formatar o cronômetro
     function formatarTempo(segundos) {
@@ -199,6 +229,12 @@
         }
         cronometroAtivo = !cronometroAtivo;
     }
+
+    // Alternar entre os períodos ao clicar
+    document.getElementById('periodo').addEventListener('click', function() {
+        indicePeriodo = (indicePeriodo + 1) % periodos.length; // Alterna entre os períodos
+        this.innerText = periodos[indicePeriodo]; // Atualiza o texto da div
+    });
 
     // Listener para Control + Insert para controlar o cronômetro
     document.addEventListener('keydown', function(event) {
