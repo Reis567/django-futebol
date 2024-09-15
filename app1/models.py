@@ -6,7 +6,7 @@ from datetime import timedelta
 class Time(models.Model):
     nome = models.CharField(max_length=100)
     jogadores_titulares = models.ManyToManyField('Jogador', related_name='titulares')
-    jogadores_banco = models.ManyToManyField('Jogador', related_name='banco')
+    jogadores_banco = models.ManyToManyField('Jogador', related_name='banco', null=True,blank=True)
 
     def __str__(self):
         return self.nome
@@ -22,7 +22,7 @@ class Jogador(models.Model):
         ('ATA', 'Atacante'),
     ]
     posicao = models.CharField(max_length=3, choices=POSICOES)
-    time = models.ForeignKey(Time, on_delete=models.CASCADE)
+    time = models.ForeignKey(Time, on_delete=models.CASCADE, null=True,blank=True)
     cartoes_amarelos = models.IntegerField(default=0)
     cartao_vermelho = models.BooleanField(default=False)
 
@@ -36,7 +36,7 @@ class Jogador(models.Model):
         self.cartao_vermelho = True
 
     def __str__(self):
-        return f'{self.nome} ({self.time.nome}) - Camisa {self.numero_camisa}'
+        return f'{self.nome} - Camisa {self.numero_camisa}'
 
 # Modelo para Substituicao
 class Substituicao(models.Model):

@@ -1,25 +1,107 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
-    <h1>Bem-vindo à página principal!</h1>
 
-    <h2>Times</h2>
-    <ul>
-        {% for time in times %}
-            <li>{{ time.nome }}</li>
-        {% empty %}
-            <li>Não há times cadastrados.</li>
-        {% endfor %}
-    </ul>
 
-    <h2>Partidas Já Transmitidas</h2>
-    <ul>
-        {% for partida in partidas %}
-            <li>{{ partida.time_casa.nome }} {{ partida.placar_casa }} x {{ partida.placar_visitante }} {{ partida.time_visitante.nome }} - Competição: {{ partida.competicao.nome }}</li>
-        {% empty %}
-            <li>Não há partidas transmitidas até o momento.</li>
-        {% endfor %}
-    </ul>
+    <div class="container">
+        <img src="{% static 'imgs/djangol3.png' %}" alt="Logo" style="max-height: 200px;">
+        <div class="row">
+            <!-- Coluna para a Tabela de Partidas Transmitidas -->
+            <div class="col-md-6">
+                <!-- Botão para Iniciar Transmissão -->
+                <button type="button" class="btn btn-primary mb-3" onclick="location.href='{% url 'iniciar_transmissao' %}'">Iniciar Transmissão</button>
+                <h2 class="table-title">Partidas Já Transmitidas</h2>
+                <table id="partidasTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Time Casa</th>
+                            <th>Placar Casa</th>
+                            <th>Placar Visitante</th>
+                            <th>Time Visitante</th>
+                            <th>Competição</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for partida in partidas %}
+                            <tr>
+                                <td>{{ partida.time_casa.nome }}</td>
+                                <td>{{ partida.placar_casa }}</td>
+                                <td>{{ partida.placar_visitante }}</td>
+                                <td>{{ partida.time_visitante.nome }}</td>
+                                <td>{{ partida.competicao.nome }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5">Não há partidas transmitidas até o momento.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-    <button type="button" onclick="location.href='{% url 'iniciar_transmissao' %}'">Iniciar Transmissão</button>
+            <!-- Coluna para a Tabela de Times -->
+            <div class="col-md-6">
+                <!-- Botão para Criar Time -->
+                <button type="button" class="btn btn-success mb-3" onclick="location.href=''">Criar Time</button>
+                <h2 class="table-title">Times</h2>
+                <table id="timesTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for time in times %}
+                            <tr>
+                                <td>{{ time.nome }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="1">Não há times cadastrados.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <style>
+        /* Estilo para o título da página */
+    .page-title {
+        font-size: 36px; /* Aumenta o tamanho da fonte */
+        font-weight: bold; /* Torna o texto em negrito */
+        margin-bottom: 20px; /* Espaçamento inferior */
+    }
+    
+    /* Estilo para os títulos das tabelas */
+    .table-title {
+        font-size: 28px; /* Aumenta o tamanho da fonte */
+        font-weight: bold; /* Torna o texto em negrito */
+        margin-bottom: 15px; /* Espaçamento inferior */
+        color: #333; /* Cor do texto */
+    }
+    
+    /* Estilo adicional para melhorar o layout */
+    .container {
+        padding-top: 20px; /* Espaçamento superior */
+    }
+    
+    </style>
 {% endblock %}
+

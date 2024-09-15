@@ -80,3 +80,62 @@ img {
 *::after {
     box-sizing: border-box;
 }
+/* Estilo para o container dos botões do DataTables */
+.dt-buttons {
+    margin: 10px 0;
+}
+
+/* Estilo para cada botão */
+.dt-button {
+    background-color: #007bff; /* Cor de fundo azul */
+    color: #ffffff; /* Cor do texto branca */
+    border: none; /* Remove a borda padrão */
+    border-radius: 5px; /* Bordas arredondadas */
+    padding: 10px 20px; /* Espaçamento interno */
+    font-size: 14px; /* Tamanho da fonte */
+    font-weight: bold; /* Negrito */
+    cursor: pointer; /* Muda o cursor para indicar que é clicável */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Transições suaves */
+}
+
+/* Estilo para o botão ao passar o mouse (hover) */
+.dt-button:hover {
+    background-color: #0056b3; /* Cor de fundo mais escura no hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+}
+
+/* Estilo para o botão ativo */
+.dt-button:active {
+    background-color: #004494; /* Cor de fundo ainda mais escura ao clicar */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra reduzida ao clicar */
+}
+
+/* Estilo específico para o botão de visibilidade das colunas */
+.dt-button.buttons-colvis {
+    background-color: #795548; /* Cor de fundo verde */
+}
+
+/* Estilo para o botão de visibilidade das colunas ao passar o mouse */
+.dt-button.buttons-colvis:hover {
+    background-color: #2e1a17; /* Cor de fundo verde escura no hover */
+}
+
+/* Estilo específico para os botões de exportação para Excel e PDF */
+.dt-button.buttons-html5 {
+    background-color: #795548; /* Cor de fundo amarela */
+}
+
+/* Estilo para os botões de exportação ao passar o mouse */
+.dt-button.buttons-html5:hover {
+    background-color: #2e1a17; /* Cor de fundo amarela escura no hover */
+}
+
+/* Estilo específico para o botão de impressão */
+.dt-button.buttons-print {
+    background-color: #795548; /* Cor de fundo vermelha */
+}
+
+/* Estilo para o botão de impressão ao passar o mouse */
+.dt-button.buttons-print:hover {
+    background-color: #2e1a17; /* Cor de fundo vermelha escura no hover */
+}
