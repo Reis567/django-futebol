@@ -131,7 +131,7 @@
     <div class="time time-casa">
         <h2 class="time-nome">{{ partida.time_casa.nome }}</h2>
         <div class="jogadores">
-            {% for jogador in partida.time_casa.jogadores_titulares.all %}
+            {% for jogador in titulares_casa %}
                 <div class="jogador">
                     <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                     <div class="nome-jogador">{{ jogador.nome }}</div>
@@ -142,7 +142,7 @@
         <div class="banco">
             <h3>Banco de Reservas</h3>
             <div class="jogadores">
-                {% for jogador in partida.time_casa.jogadores_banco.all %}
+                {% for jogador in banco_casa %}
                     <div class="jogador">
                         <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                         <div class="nome-jogador">{{ jogador.nome }}</div>
@@ -151,6 +151,9 @@
             </div>
         </div>
     </div>
+    
+    
+    
 
     <div class="central">
         <div class="periodo" id="periodo">1T</div> <!-- Div para alternar o período -->
@@ -175,7 +178,7 @@
     <div class="time time-visitante">
         <h2 class="time-nome">{{ partida.time_visitante.nome }}</h2>
         <div class="jogadores">
-            {% for jogador in partida.time_visitante.jogadores_titulares.all %}
+            {% for jogador in titulares_visitante %}
                 <div class="jogador">
                     <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                     <div class="nome-jogador">{{ jogador.nome }}</div>
@@ -186,7 +189,7 @@
         <div class="banco">
             <h3>Banco de Reservas</h3>
             <div class="jogadores">
-                {% for jogador in partida.time_visitante.jogadores_banco.all %}
+                {% for jogador in banco_visitante %}
                     <div class="jogador">
                         <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                         <div class="nome-jogador">{{ jogador.nome }}</div>

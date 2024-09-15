@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import *
 from django.shortcuts import redirect
 from django.db.models import Count, Q
-
+from django.db.models import Case, When, IntegerField
 
 
 def home(request):
@@ -47,10 +47,41 @@ def selecionar_partida(request):
     return render(request, 'transmissao/selecionar_partida.html', {'times': times, 'competicoes': competicoes})
 
 
-
 def transmissao_partida(request, partida_id):
     partida = get_object_or_404(Partida, id=partida_id)
 
+    # Defina a ordem desejada para as posições
+    ordem_posicao = Case(
+        When(posicao='GOL', then=1),
+        When(posicao='DEF', then=2),
+        When(posicao='MEI', then=3),
+        When(posicao='ATA', then=4),
+        output_field=IntegerField()
+    )
 
+    # Ordenar jogadores por posição para titulares e banco do time da casa
+    titulares_casa = partida.time_casa.jogadores_titulares.annotate(
+        posicao_ordenada=ordem_posicao
+    ).order_by('posicao_ordenada')
+    
+    banco_casa = partida.time_casa.jogadores_banco.annotate(
+        posicao_ordenada=ordem_posicao
+    ).order_by('posicao_ordenada')
 
-    return render(request, 'transmissao/transmissao_partida.html', {'partida': partida})
+    titulares_visitante = partida.time_visitante.jogadores_titulares.annotate(
+        posicao_ordenada=ordem_posicao
+    ).order_by('posicao_ordenada')
+    
+    banco_visitante = partida.time_visitante.jogadores_banco.annotate(
+        posicao_ordenada=ordem_posicao
+    ).order_by('posicao_ordenada')
+
+    context = {
+        'partida': partida,
+        'titulares_casa': titulares_casa,
+        'banco_casa': banco_casa,
+        'titulares_visitante': titulares_visitante,
+        'banco_visitante': banco_visitante,
+    }
+
+    return render(request, 'transmissao/transmissao_partida.html', context)
