@@ -3,7 +3,7 @@
 <style>
     .transmissao-container {
         display: grid;
-        grid-template-columns: 1fr 2fr 1fr;
+        grid-template-columns: 1fr 2fr 1fr; /* Três colunas: casa, central, visitante */
         gap: 20px;
         padding: 20px;
         height: 100vh;
@@ -16,96 +16,162 @@
         align-items: center;
     }
 
-    .time h2 {
+    .time-nome {
         margin-bottom: 10px;
+        font-size: 20px;
     }
 
     .jogadores {
-        list-style: none;
-        padding: 0;
-        text-align: left;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
     }
 
-    .jogadores li {
+    .jogador {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid #ccc;
+        padding: 8px 18px;
         margin-bottom: 5px;
     }
 
-    .placar {
-        grid-column: 2;
+    .numero-jogador {
         text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+    }
+
+    .placar {
+        text-align: center;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px; /* Espaçamento entre os placares e o cronômetro */
     }
 
     .placar h1 {
         font-size: 2.5rem;
-        margin-bottom: 10px;
+        margin: 0;
     }
 
     .cronometro {
         font-size: 2rem;
-        margin-bottom: 20px;
+        background-color: #8B4513; /* Marrom */
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
     }
 
     .webcams-container {
         display: flex;
         justify-content: space-around;
+        width: 100%;
         margin-bottom: 20px;
     }
 
     .webcam {
-        width: 45%;
-        height: 200px;
+        width: 48%; /* Webcams maiores */
+        height: 300px; /* Aumentado */
         background-color: #333;
         display: flex;
         justify-content: center;
         align-items: center;
         color: white;
+        font-size: 1.5rem;
     }
 
     .patrocinadores {
-        grid-column: 1 / span 3;
+        width: 100%; /* Ocupar a largura das webcams */
         text-align: center;
-        height: 100px;
+        height: 300px;
         background-color: #f2f2f2;
         margin-top: 20px;
+    }
+
+    .tecnico,
+    .banco {
+        margin-top: 20px;
+    }
+
+    .competicao {
+        font-size: 1.8rem;
+        text-align: center;
+        margin-top: 10px;
     }
 </style>
 
 <div class="transmissao-container">
-    <!-- Jogadores do Time da Casa -->
+    <!-- Primeira coluna: Time da Casa -->
     <div class="time time-casa">
-        <h2>{{ partida.time_casa.nome }}</h2>
-        <ul class="jogadores">
+        <h2 class="time-nome">{{ partida.time_casa.nome }}</h2>
+        <div class="jogadores">
             {% for jogador in partida.time_casa.jogadores_titulares.all %}
-                <li>{{ jogador.numero_camisa }} - {{ jogador.nome }}</li>
+                <div class="jogador">
+                    <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
+                    <div class="nome-jogador">{{ jogador.nome }}</div>
+                </div>
             {% endfor %}
-        </ul>
+        </div>
+        <div class="tecnico">Técnico: {{ partida.time_casa.tecnico }}</div>
+        <div class="banco">
+            <h3>Banco de Reservas</h3>
+            <div class="jogadores">
+                {% for jogador in partida.time_casa.jogadores_banco.all %}
+                    <div class="jogador">
+                        <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
+                        <div class="nome-jogador">{{ jogador.nome }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
-    <!-- Placar e Cronômetro -->
-    <div class="placar">
-        <h1>{{ partida.time_casa.nome }} {{ partida.placar_casa }} x {{ partida.placar_visitante }} {{ partida.time_visitante.nome }}</h1>
-        <div class="cronometro" id="cronometro">00:00</div>
+    <!-- Coluna central: Placar, Cronômetro, Webcams e Patrocinadores -->
+    <div class="central">
+        <div class="placar">
+            <h1>{{ partida.time_casa.sigla }} {{ partida.placar_casa }}</h1>
+            <div class="cronometro" id="cronometro">00:00</div>
+            <h1>{{ partida.placar_visitante }} {{ partida.time_visitante.sigla }}</h1>
+        </div>
+        <div class="competicao">
+            <p>{{ partida.competicao.nome }}</p>
+        </div>
+        <div class="webcams-container">
+            <div class="webcam" id="webcam1">Webcam 1</div>
+            <div class="webcam" id="webcam2">Webcam 2</div>
+        </div>
+        <div class="patrocinadores">
+            <p>Patrocinadores</p>
+        </div>
     </div>
 
-    <!-- Jogadores do Time Visitante -->
+    <!-- Última coluna: Time Visitante -->
     <div class="time time-visitante">
-        <h2>{{ partida.time_visitante.nome }}</h2>
-        <ul class="jogadores">
+        <h2 class="time-nome">{{ partida.time_visitante.nome }}</h2>
+        <div class="jogadores">
             {% for jogador in partida.time_visitante.jogadores_titulares.all %}
-                <li>{{ jogador.numero_camisa }} - {{ jogador.nome }}</li>
+                <div class="jogador">
+                    <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
+                    <div class="nome-jogador">{{ jogador.nome }}</div>
+                </div>
             {% endfor %}
-        </ul>
-    </div>
-
-    <!-- Webcams dos Narradores -->
-    <div class="webcams-container">
-        <div class="webcam" id="webcam1">Webcam 1</div>
-        <div class="webcam" id="webcam2">Webcam 2</div>
-    </div>
-
-    <!-- Container para Patrocinadores -->
-    <div class="patrocinadores">
-        <p>Patrocinadores</p>
+        </div>
+        <div class="tecnico">Técnico: {{ partida.time_visitante.tecnico }}</div>
+        <div class="banco">
+            <h3>Banco de Reservas</h3>
+            <div class="jogadores">
+                {% for jogador in partida.time_visitante.jogadores_banco.all %}
+                    <div class="jogador">
+                        <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
+                        <div class="nome-jogador">{{ jogador.nome }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </div>
 
@@ -134,9 +200,9 @@
         cronometroAtivo = !cronometroAtivo;
     }
 
-    // Listener para Control + Page Up para controlar o cronômetro
+    // Listener para Control + Insert para controlar o cronômetro
     document.addEventListener('keydown', function(event) {
-        if (event.ctrlKey && event.key === 'insert') {
+        if (event.ctrlKey && event.key === 'Insert') {
             controlarCronometro();
         }
     });
