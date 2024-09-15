@@ -139,3 +139,11 @@ img {
 .dt-button.buttons-print:hover {
     background-color: #2e1a17; /* Cor de fundo vermelha escura no hover */
 }
+.btn-primary{
+    background-color: #2e1a17;
+    border:none;
+}
+
+.btn-primary:hover{
+    background-color: #795548;  
+}

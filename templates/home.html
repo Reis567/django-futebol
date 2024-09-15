@@ -4,11 +4,13 @@
 
 
     <div class="container">
-        <img src="{% static 'imgs/djangol3.png' %}" alt="Logo" style="max-height: 200px;">
+        <div class="logo-container">
+            <img src="{% static 'imgs/djangol3.png' %}" alt="Logo" class="logo">
+        </div>
         <div class="row">
-            <!-- Coluna para a Tabela de Partidas Transmitidas -->
-            <div class="col-md-6">
-                <!-- Botão para Iniciar Transmissão -->
+
+            <div class="col-md-6 ">
+
                 <button type="button" class="btn btn-primary mb-3" onclick="location.href='{% url 'iniciar_transmissao' %}'">Iniciar Transmissão</button>
                 <h2 class="table-title">Partidas Já Transmitidas</h2>
                 <table id="partidasTable" class="table table-striped">
@@ -32,7 +34,11 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="5">Não há partidas transmitidas até o momento.</td>
+                                <td>Não há partidas transmitidas até o momento.</td>
+                                <td>Não há partidas transmitidas até o momento.</td>
+                                <td>Não há partidas transmitidas até o momento.</td>
+                                <td>Não há partidas transmitidas até o momento.</td>
+                                <td>Não há partidas transmitidas até o momento.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -42,7 +48,7 @@
             <!-- Coluna para a Tabela de Times -->
             <div class="col-md-6">
                 <!-- Botão para Criar Time -->
-                <button type="button" class="btn btn-success mb-3" onclick="location.href=''">Criar Time</button>
+                <button type="button" class="btn btn-primary mb-3" onclick="location.href=''">Criar Time</button>
                 <h2 class="table-title">Times</h2>
                 <table id="timesTable" class="table table-striped">
                     <thead>
@@ -57,7 +63,7 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="1">Não há times cadastrados.</td>
+                                <td>Não há times cadastrados.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -82,26 +88,36 @@
 
 
     <style>
+        /* Estilo para centralizar o logo e adicionar margem */
+        .logo-container {
+            margin-bottom: 30px; /* Adiciona espaçamento abaixo do logo */
+        }
+
+        .logo {
+            max-height: 200px;
+            display: block;
+            margin: 0 auto; /* Centraliza a imagem horizontalmente */
+        }
+
         /* Estilo para o título da página */
-    .page-title {
-        font-size: 36px; /* Aumenta o tamanho da fonte */
-        font-weight: bold; /* Torna o texto em negrito */
-        margin-bottom: 20px; /* Espaçamento inferior */
-    }
-    
-    /* Estilo para os títulos das tabelas */
-    .table-title {
-        font-size: 28px; /* Aumenta o tamanho da fonte */
-        font-weight: bold; /* Torna o texto em negrito */
-        margin-bottom: 15px; /* Espaçamento inferior */
-        color: #333; /* Cor do texto */
-    }
-    
-    /* Estilo adicional para melhorar o layout */
-    .container {
-        padding-top: 20px; /* Espaçamento superior */
-    }
-    
+        .page-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Estilo para os títulos das tabelas */
+        .table-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        /* Ajuste adicional para layout */
+        .container {
+            padding-top: 20px;
+        }
     </style>
 {% endblock %}
 
