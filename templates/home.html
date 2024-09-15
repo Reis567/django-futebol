@@ -54,20 +54,25 @@
                     <thead>
                         <tr>
                             <th>Nome</th>
+                            <th>Jogadores</th>
+                            <th>Partidas Jogadas</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for time in times %}
                             <tr>
                                 <td>{{ time.nome }}</td>
+                                <td>{{ time.num_jogadores }}</td>
+                                <td>{{ time.num_partidas }}</td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td>Não há times cadastrados.</td>
+                                <td colspan="3">Não há times cadastrados.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                
             </div>
         </div>
     </div>
