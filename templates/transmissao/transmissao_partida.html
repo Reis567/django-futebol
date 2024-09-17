@@ -267,8 +267,9 @@
     let cronometroAtivo = false;
     let segundos = 0;
     let intervalo;
-    const periodos = ['1T', '2T', '1TP', '2TP', 'PEN']; // Array de períodos
-    let indicePeriodo = 0; // Índice atual do período
+    const periodos = ['1T', '2T', '1TP', '2TP', 'PEN'];
+    let indicePeriodo = 0;
+    let editando = false; // Variável para controlar se o cronômetro está sendo editado
 
     // Função para formatar o cronômetro
     function formatarTempo(segundos) {
@@ -280,34 +281,88 @@
     // Função para iniciar/pausar o cronômetro
     function controlarCronometro() {
         if (cronometroAtivo) {
-            clearInterval(intervalo); // Pausa o cronômetro
+            clearInterval(intervalo);
         } else {
             intervalo = setInterval(() => {
                 segundos++;
                 document.getElementById('cronometro').innerText = formatarTempo(segundos);
-            }, 1000); // Inicia o cronômetro
+            }, 1000);
         }
-        cronometroAtivo = !cronometroAtivo; // Alterna o estado do cronômetro
+        cronometroAtivo = !cronometroAtivo;
+    }
+
+    // Função para permitir edição manual
+    function habilitarEdicao() {
+        const cronometroDiv = document.getElementById('cronometro');
+        
+        // Se já está em modo de edição, não faz nada
+        if (editando) return;
+        
+        // Pega o tempo atual e transforma a div em um input
+        const valorAtual = cronometroDiv.innerText;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = valorAtual;
+        input.style.width = '60px';
+        input.style.textAlign = 'center';
+        input.style.fontSize = '2rem';
+        cronometroDiv.innerHTML = '';
+        cronometroDiv.appendChild(input);
+        input.focus();
+        editando = true;
+
+        // Quando o usuário clicar fora ou pressionar Enter, salvar o valor editado
+        input.addEventListener('blur', function() {
+            salvarEdicao(input.value);
+        });
+        input.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                salvarEdicao(input.value);
+            }
+        });
+    }
+
+    // Função para salvar o valor editado
+    function salvarEdicao(valorEditado) {
+        const cronometroDiv = document.getElementById('cronometro');
+        const [minutos, segundosEditados] = valorEditado.split(':').map(Number);
+
+        // Atualizar os segundos com o valor editado
+        segundos = (minutos * 60) + segundosEditados;
+        cronometroDiv.innerText = formatarTempo(segundos);
+        editando = false;
     }
 
     // Alternar entre os períodos ao clicar
     document.getElementById('periodo').addEventListener('click', function() {
-        indicePeriodo = (indicePeriodo + 1) % periodos.length; // Alterna entre os períodos
-        this.innerText = periodos[indicePeriodo]; // Atualiza o texto da div
+        indicePeriodo = (indicePeriodo + 1) % periodos.length;
+        this.innerText = periodos[indicePeriodo];
     });
 
     // Controlar o cronômetro ao clicar no cronômetro
-    document.getElementById('cronometro').addEventListener('click', function() {
-        controlarCronometro(); // Inicia ou pausa o cronômetro com clique
+    document.getElementById('cronometro').addEventListener('click', function(event) {
+        if (event.ctrlKey) {
+            habilitarEdicao(); // Permitir edição manual se Ctrl for pressionado
+        } else {
+            controlarCronometro(); // Iniciar/pausar o cronômetro com clique simples
+        }
     });
 
     // Listener para Control + Insert para controlar o cronômetro
     document.addEventListener('keydown', function(event) {
         if (event.ctrlKey && event.key === 'Insert') {
-            controlarCronometro(); // Inicia ou pausa o cronômetro com Ctrl + Insert
+            controlarCronometro();
+        }
+
+        // Listener para Ctrl + Z para zerar o cronômetro
+        if (event.ctrlKey && event.key === 'z') {
+            segundos = 0;
+            document.getElementById('cronometro').innerText = formatarTempo(segundos);
         }
     });
 </script>
+
+
 
 
 
