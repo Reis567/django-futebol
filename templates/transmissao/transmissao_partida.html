@@ -286,4 +286,40 @@
         }
     });
 </script>
+
+<!--ACOES -->
+<script>
+    // Funções de drag-and-drop
+    const icones = document.querySelectorAll('.icone-acao');
+    const jogadores = document.querySelectorAll('.jogador');
+
+    // Adicionar os eventos de dragstart nos ícones
+    icones.forEach(icone => {
+        icone.addEventListener('dragstart', function (e) {
+            e.dataTransfer.setData('text/plain', this.id); // Passa o ID do ícone
+        });
+    });
+
+    // Preparar os jogadores para receber o drop
+    jogadores.forEach(jogador => {
+        const dropArea = document.createElement('div');
+        dropArea.classList.add('drop-area');
+        jogador.appendChild(dropArea);
+
+        // Permitir o drop
+        dropArea.addEventListener('dragover', function (e) {
+            e.preventDefault(); // Necessário para permitir o drop
+        });
+
+        // Lidar com o drop
+        dropArea.addEventListener('drop', function (e) {
+            e.preventDefault();
+            const idIcone = e.dataTransfer.getData('text/plain');
+            const icone = document.getElementById(idIcone);
+            
+            // Apenas imprime o id por enquanto
+            alert(`Você arrastou o ícone ${idIcone} para o jogador ${jogador.querySelector('.nome-jogador').innerText}`);
+        });
+    });
+</script>
 {% endblock %}
