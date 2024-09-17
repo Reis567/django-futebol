@@ -34,6 +34,7 @@
         border: 1px solid #ccc;
         padding: 8px 18px;
         margin-bottom: 5px;
+        position: relative;
     }
 
     .numero-jogador {
@@ -124,6 +125,35 @@
         padding: 5px 10px;
         border-radius: 5px;
     }
+    .drop-area {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+    .icones-acoes {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 5px;
+    }
+
+    .icone-acao {
+        width: 50px;
+        height: 50px;
+        background-color: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        border-radius: 50%;
+        border: 2px solid #ccc;
+        cursor: grab;
+    }
+
 </style>
 
 <div class="transmissao-container">
@@ -175,6 +205,13 @@
                 <video src=""></video>
             </div>
         </div>
+    <!-- Novos ícones para arrastar e soltar -->
+    <div class="icones-acoes">
+        <div class="icone-acao" id="bola" draggable="true">⚽</div>
+        <div class="icone-acao" id="cartao-amarelo" draggable="true">🟨</div>
+        <div class="icone-acao" id="cartao-vermelho" draggable="true">🟥</div>
+        <div class="icone-acao" id="substituicao" draggable="true">🔄</div>
+    </div>
     </div>
 
     <!-- Última coluna: Time Visitante -->
