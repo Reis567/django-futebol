@@ -44,15 +44,6 @@ class Jogador(models.Model):
         return f'{self.nome} - Camisa {self.numero_camisa}'
 
 
-# Modelo para Substituicao
-class Substituicao(models.Model):
-    jogador_entrou = models.ForeignKey(Jogador, related_name='entrou', on_delete=models.CASCADE)
-    jogador_saiu = models.ForeignKey(Jogador, related_name='saiu', on_delete=models.CASCADE)
-    tempo = models.CharField(max_length=10, null=True, blank=True)  # Tempo da substituição no formato XX:XX/2T
-
-    def __str__(self):
-        return f'Substituição: {self.jogador_saiu.nome} saiu, {self.jogador_entrou.nome} entrou'
-
 
 # Modelo para Competição
 class Competicao(models.Model):
