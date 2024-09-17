@@ -153,34 +153,40 @@
         border: 2px solid #ccc;
         cursor: grab;
     }
-
+    .icone-substituicao {
+        width: 20px;
+        margin-left: 5px;
+    }
 </style>
 
 <div class="transmissao-container">
-    <!-- Primeira coluna: Time da Casa -->
-    <div class="time time-casa">
-        <h2 class="time-nome">{{ partida.time_casa.nome }}</h2>
+<!-- Primeira coluna: Time da Casa -->
+<div class="time time-casa">
+    <h2 class="time-nome">{{ partida.time_casa.nome }}</h2>
+    <div class="jogadores">
+        {% for jogador in titulares_casa %}
+            <div class="jogador">
+                <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
+                <div class="nome-jogador">{{ jogador.nome }}</div>
+                <div class="drop-area"></div> <!-- Área para receber o ícone de substituição -->
+            </div>
+        {% endfor %}
+    </div>
+    <div class="tecnico">Técnico: {{ partida.time_casa.tecnico }}</div>
+    <div class="banco">
+        <h3>Banco de Reservas</h3>
         <div class="jogadores">
-            {% for jogador in titulares_casa %}
+            {% for jogador in banco_casa %}
                 <div class="jogador">
                     <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                     <div class="nome-jogador">{{ jogador.nome }}</div>
+                    <div class="drop-area"></div> <!-- Área para receber o ícone de substituição -->
                 </div>
             {% endfor %}
         </div>
-        <div class="tecnico">Técnico: {{ partida.time_casa.tecnico }}</div>
-        <div class="banco">
-            <h3>Banco de Reservas</h3>
-            <div class="jogadores">
-                {% for jogador in banco_casa %}
-                    <div class="jogador">
-                        <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
-                        <div class="nome-jogador">{{ jogador.nome }}</div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
     </div>
+</div>
+
     
     
     
@@ -214,30 +220,35 @@
     </div>
     </div>
 
-    <!-- Última coluna: Time Visitante -->
-    <div class="time time-visitante">
-        <h2 class="time-nome">{{ partida.time_visitante.nome }}</h2>
+<!-- Última coluna: Time Visitante -->
+<div class="time time-visitante">
+    <h2 class="time-nome">{{ partida.time_visitante.nome }}</h2>
+    <div class="jogadores">
+        {% for jogador in titulares_visitante %}
+            <div class="jogador">
+                <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
+                <div class="nome-jogador">{{ jogador.nome }}</div>
+                <div class="drop-area"></div> <!-- Área para receber o ícone de substituição -->
+            </div>
+        {% endfor %}
+    </div>
+    <div class="tecnico">Técnico: {{ partida.time_visitante.tecnico }}</div>
+    <div class="banco">
+        <h3>Banco de Reservas</h3>
         <div class="jogadores">
-            {% for jogador in titulares_visitante %}
+            {% for jogador in banco_visitante %}
                 <div class="jogador">
                     <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                     <div class="nome-jogador">{{ jogador.nome }}</div>
+                    <div class="drop-area"></div> <!-- Área para receber o ícone de substituição -->
                 </div>
             {% endfor %}
         </div>
-        <div class="tecnico">Técnico: {{ partida.time_visitante.tecnico }}</div>
-        <div class="banco">
-            <h3>Banco de Reservas</h3>
-            <div class="jogadores">
-                {% for jogador in banco_visitante %}
-                    <div class="jogador">
-                        <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
-                        <div class="nome-jogador">{{ jogador.nome }}</div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
     </div>
+</div>
+
+
+
 </div>
 
 
@@ -302,9 +313,7 @@
 
     // Preparar os jogadores para receber o drop
     jogadores.forEach(jogador => {
-        const dropArea = document.createElement('div');
-        dropArea.classList.add('drop-area');
-        jogador.appendChild(dropArea);
+        const dropArea = jogador.querySelector('.drop-area');
 
         // Permitir o drop
         dropArea.addEventListener('dragover', function (e) {
@@ -317,8 +326,12 @@
             const idIcone = e.dataTransfer.getData('text/plain');
             const icone = document.getElementById(idIcone);
             
-            // Apenas imprime o id por enquanto
-            alert(`Você arrastou o ícone ${idIcone} para o jogador ${jogador.querySelector('.nome-jogador').innerText}`);
+            // Adicionar ícone de substituição ao lado do nome do jogador
+            const nomeJogador = jogador.querySelector('.nome-jogador');
+            const novoIcone = document.createElement('img');
+            novoIcone.src = icone.src;
+            novoIcone.classList.add('icone-substituicao'); // Adicionar uma classe para estilizar o ícone
+            nomeJogador.appendChild(novoIcone); // Adiciona o ícone ao lado do nome do jogador
         });
     });
 </script>
