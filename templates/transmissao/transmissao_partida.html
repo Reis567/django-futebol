@@ -162,6 +162,10 @@
 </style>
 
 <div class="transmissao-container">
+
+
+
+
 <!-- Primeira coluna: Time da Casa -->
 <div class="time time-casa">
     <h2 class="time-nome">{{ partida.time_casa.nome }}</h2>
@@ -276,14 +280,14 @@
     // Função para iniciar/pausar o cronômetro
     function controlarCronometro() {
         if (cronometroAtivo) {
-            clearInterval(intervalo);
+            clearInterval(intervalo); // Pausa o cronômetro
         } else {
             intervalo = setInterval(() => {
                 segundos++;
                 document.getElementById('cronometro').innerText = formatarTempo(segundos);
-            }, 1000);
+            }, 1000); // Inicia o cronômetro
         }
-        cronometroAtivo = !cronometroAtivo;
+        cronometroAtivo = !cronometroAtivo; // Alterna o estado do cronômetro
     }
 
     // Alternar entre os períodos ao clicar
@@ -292,55 +296,65 @@
         this.innerText = periodos[indicePeriodo]; // Atualiza o texto da div
     });
 
+    // Controlar o cronômetro ao clicar no cronômetro
+    document.getElementById('cronometro').addEventListener('click', function() {
+        controlarCronometro(); // Inicia ou pausa o cronômetro com clique
+    });
+
     // Listener para Control + Insert para controlar o cronômetro
     document.addEventListener('keydown', function(event) {
         if (event.ctrlKey && event.key === 'Insert') {
-            controlarCronometro();
+            controlarCronometro(); // Inicia ou pausa o cronômetro com Ctrl + Insert
         }
     });
 </script>
 
+
+
+
+
+
 <!--ACOES -->
 <script>
-// Funções de drag-and-drop
-const icones = document.querySelectorAll('.icone-acao');
-const jogadores = document.querySelectorAll('.jogador');
+    // Funções de drag-and-drop
+    const icones = document.querySelectorAll('.icone-acao');
+    const jogadores = document.querySelectorAll('.jogador');
 
-// Adicionar os eventos de dragstart nos ícones
-icones.forEach(icone => {
-    icone.addEventListener('dragstart', function (e) {
-        e.dataTransfer.setData('text/plain', this.innerHTML); // Passa o conteúdo do ícone (ex: ⚽, 🟨, etc)
-    });
-});
-
-jogadores.forEach(jogador => {
-    const dropArea = jogador.querySelector('.drop-area');
-
-    // Permitir o drop
-    dropArea.addEventListener('dragover', function (e) {
-        e.preventDefault(); // Necessário para permitir o drop
+    // Adicionar os eventos de dragstart nos ícones
+    icones.forEach(icone => {
+        icone.addEventListener('dragstart', function (e) {
+            e.dataTransfer.setData('text/plain', this.innerHTML); // Passa o conteúdo do ícone (ex: ⚽, 🟨, etc)
+        });
     });
 
-    // Lidar com o drop
-    dropArea.addEventListener('drop', function (e) {
-        e.preventDefault();
-        const iconeHtml = e.dataTransfer.getData('text/plain'); // Pega o ícone que foi arrastado
-        const nomeJogador = jogador.querySelector('.nome-jogador');
+    jogadores.forEach(jogador => {
+        const dropArea = jogador.querySelector('.drop-area');
 
-        // Criar um elemento de ícone para ser adicionado ao jogador
-        const novoIcone = document.createElement('span');
-        novoIcone.classList.add('icone-substituicao');
-        novoIcone.innerHTML = iconeHtml; // Define o ícone
-
-        // Adicionar evento para remover o ícone ao clicar
-        novoIcone.addEventListener('click', function() {
-            nomeJogador.removeChild(novoIcone); // Remove o ícone ao ser clicado
+        // Permitir o drop
+        dropArea.addEventListener('dragover', function (e) {
+            e.preventDefault(); // Necessário para permitir o drop
         });
 
-        // Adiciona o ícone ao lado direito do nome do jogador
-        nomeJogador.appendChild(novoIcone); 
+        // Lidar com o drop
+        dropArea.addEventListener('drop', function (e) {
+            e.preventDefault();
+            const iconeHtml = e.dataTransfer.getData('text/plain'); // Pega o ícone que foi arrastado
+            const nomeJogador = jogador.querySelector('.nome-jogador');
+
+            // Criar um elemento de ícone para ser adicionado ao jogador
+            const novoIcone = document.createElement('span');
+            novoIcone.classList.add('icone-substituicao');
+            novoIcone.innerHTML = iconeHtml; // Define o ícone
+
+            // Adicionar evento para remover o ícone ao clicar
+            novoIcone.addEventListener('click', function() {
+                nomeJogador.removeChild(novoIcone); // Remove o ícone ao ser clicado
+            });
+
+            // Adiciona o ícone ao lado direito do nome do jogador
+            nomeJogador.appendChild(novoIcone); 
+        });
     });
-});
 
 
 
