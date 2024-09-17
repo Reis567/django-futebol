@@ -133,6 +133,8 @@
         right: 0;
         opacity: 0;
         cursor: pointer;
+        width: 150px; /* Defina uma largura menor */
+        height: 50px; 
     }
     .icones-acoes {
         display: flex;
@@ -191,6 +193,7 @@
     
     
 
+    <!-- Coluna Central -->
     <div class="central">
         <div class="periodo" id="periodo">1T</div> <!-- Div para alternar o período -->
         <div class="placar">
@@ -211,32 +214,19 @@
                 <video src=""></video>
             </div>
         </div>
-    <!-- Novos ícones para arrastar e soltar -->
-    <div class="icones-acoes">
-        <div class="icone-acao" id="bola" draggable="true">⚽</div>
-        <div class="icone-acao" id="cartao-amarelo" draggable="true">🟨</div>
-        <div class="icone-acao" id="cartao-vermelho" draggable="true">🟥</div>
-        <div class="icone-acao" id="substituicao" draggable="true">🔄</div>
-    </div>
+        <div class="icones-acoes">
+            <div class="icone-acao" id="bola" draggable="true">⚽</div>
+            <div class="icone-acao" id="cartao-amarelo" draggable="true">🟨</div>
+            <div class="icone-acao" id="cartao-vermelho" draggable="true">🟥</div>
+            <div class="icone-acao" id="substituicao" draggable="true">🔄</div>
+        </div>
     </div>
 
-<!-- Última coluna: Time Visitante -->
-<div class="time time-visitante">
-    <h2 class="time-nome">{{ partida.time_visitante.nome }}</h2>
-    <div class="jogadores">
-        {% for jogador in titulares_visitante %}
-            <div class="jogador">
-                <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
-                <div class="nome-jogador">{{ jogador.nome }}</div>
-                <div class="drop-area"></div> <!-- Área para receber o ícone de substituição -->
-            </div>
-        {% endfor %}
-    </div>
-    <div class="tecnico">Técnico: {{ partida.time_visitante.tecnico }}</div>
-    <div class="banco">
-        <h3>Banco de Reservas</h3>
+    <!-- Coluna do Time Visitante -->
+    <div class="time time-visitante">
+        <h2 class="time-nome">{{ partida.time_visitante.nome }}</h2>
         <div class="jogadores">
-            {% for jogador in banco_visitante %}
+            {% for jogador in titulares_visitante %}
                 <div class="jogador">
                     <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                     <div class="nome-jogador">{{ jogador.nome }}</div>
@@ -244,13 +234,25 @@
                 </div>
             {% endfor %}
         </div>
+        <div class="tecnico">Técnico: {{ partida.time_visitante.tecnico }}</div>
+        <div class="banco">
+            <h3>Banco de Reservas</h3>
+            <div class="jogadores">
+                {% for jogador in banco_visitante %}
+                    <div class="jogador">
+                        <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
+                        <div class="nome-jogador">{{ jogador.nome }}</div>
+                        <div class="drop-area"></div> <!-- Área para receber o ícone de substituição -->
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
+
+
+
+
 </div>
-
-
-
-</div>
-
 
 
 
@@ -300,39 +302,47 @@
 
 <!--ACOES -->
 <script>
-    // Funções de drag-and-drop
-    const icones = document.querySelectorAll('.icone-acao');
-    const jogadores = document.querySelectorAll('.jogador');
+// Funções de drag-and-drop
+const icones = document.querySelectorAll('.icone-acao');
+const jogadores = document.querySelectorAll('.jogador');
 
-    // Adicionar os eventos de dragstart nos ícones
-    icones.forEach(icone => {
-        icone.addEventListener('dragstart', function (e) {
-            e.dataTransfer.setData('text/plain', this.id); // Passa o ID do ícone
-        });
+// Adicionar os eventos de dragstart nos ícones
+icones.forEach(icone => {
+    icone.addEventListener('dragstart', function (e) {
+        e.dataTransfer.setData('text/plain', this.innerHTML); // Passa o conteúdo do ícone (ex: ⚽, 🟨, etc)
+    });
+});
+
+jogadores.forEach(jogador => {
+    const dropArea = jogador.querySelector('.drop-area');
+
+    // Permitir o drop
+    dropArea.addEventListener('dragover', function (e) {
+        e.preventDefault(); // Necessário para permitir o drop
     });
 
-    // Preparar os jogadores para receber o drop
-    jogadores.forEach(jogador => {
-        const dropArea = jogador.querySelector('.drop-area');
+    // Lidar com o drop
+    dropArea.addEventListener('drop', function (e) {
+        e.preventDefault();
+        const iconeHtml = e.dataTransfer.getData('text/plain'); // Pega o ícone que foi arrastado
+        const nomeJogador = jogador.querySelector('.nome-jogador');
 
-        // Permitir o drop
-        dropArea.addEventListener('dragover', function (e) {
-            e.preventDefault(); // Necessário para permitir o drop
+        // Criar um elemento de ícone para ser adicionado ao jogador
+        const novoIcone = document.createElement('span');
+        novoIcone.classList.add('icone-substituicao');
+        novoIcone.innerHTML = iconeHtml; // Define o ícone
+
+        // Adicionar evento para remover o ícone ao clicar
+        novoIcone.addEventListener('click', function() {
+            nomeJogador.removeChild(novoIcone); // Remove o ícone ao ser clicado
         });
 
-        // Lidar com o drop
-        dropArea.addEventListener('drop', function (e) {
-            e.preventDefault();
-            const idIcone = e.dataTransfer.getData('text/plain');
-            const icone = document.getElementById(idIcone);
-            
-            // Adicionar ícone de substituição ao lado do nome do jogador
-            const nomeJogador = jogador.querySelector('.nome-jogador');
-            const novoIcone = document.createElement('img');
-            novoIcone.src = icone.src;
-            novoIcone.classList.add('icone-substituicao'); // Adicionar uma classe para estilizar o ícone
-            nomeJogador.appendChild(novoIcone); // Adiciona o ícone ao lado do nome do jogador
-        });
+        // Adiciona o ícone ao lado direito do nome do jogador
+        nomeJogador.appendChild(novoIcone); 
     });
+});
+
+
+
 </script>
 {% endblock %}
