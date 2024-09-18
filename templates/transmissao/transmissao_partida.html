@@ -85,25 +85,38 @@
         padding: 10px 20px;
         border-radius: 5px;
     }
-
     .webcams-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+
+    }
+    
+    #webcam-selector {
+        padding: 5px;
+        font-size: 10px;
+    }
+    
+    .webcams-row {
         display: flex;
         justify-content: space-around;
         width: 100%;
-        margin-bottom: 20px;
     }
-
+    
     .webcam {
-        width: 48%; /* Webcams maiores */
-        height: 300px; /* Aumentado */
-        background-color: #333;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        font-size: 1.5rem;
+        width: 320px;
+        height: 240px;
+        background-color: #000;
     }
-
+    
+    .video-webcam {
+        width: 100%;
+        height: 100%;
+    }
+    
+    
+    
     .patrocinadores {
         width: 100%; /* Ocupar a largura das webcams */
         text-align: center;
@@ -162,8 +175,7 @@
     }
     .carousel-item img{
         max-height: 250px;
-    }
-
+    }    
 </style>
 
 <div class="transmissao-container">
@@ -214,9 +226,21 @@
         <p>{{ partida.competicao.nome }}</p>
     </div>
     <div class="webcams-container">
-        <div class="webcam" id="webcam1">Webcam 1</div>
-        <div class="webcam" id="webcam2">Webcam 2</div>
+        <!-- Seletor de webcams -->
+        <select id="webcam-selector"></select>
+        
+        <!-- Row que contém as duas webcams -->
+        <div class="webcams-row">
+            <div class="webcam" id="webcam1">
+                <video autoplay playsinline id="video1" class="video-webcam"></video>
+            </div>
+            <div class="webcam" id="webcam2">
+                <video autoplay playsinline id="video2" class="video-webcam"></video>
+            </div>
+        </div>
     </div>
+    
+    
     
     <!-- Patrocinadores com Carrossel -->
     <div class="patrocinadores">
@@ -250,6 +274,9 @@
         <div class="icone-acao" id="cartao-amarelo" draggable="true">🟨</div>
         <div class="icone-acao" id="cartao-vermelho" draggable="true">🟥</div>
         <div class="icone-acao" id="substituicao" draggable="true">🔄</div>
+        <div class="icone-acao" id="gol-contra" draggable="true">❌</div>
+
+        
     </div>
 </div>
 
@@ -449,33 +476,50 @@
 
 <!--WEBCAMS-->
 <script>
-    const videoElements = document.querySelectorAll('.webcam');
-    const selectElement = document.getElementById('webcam-selector'); // Supondo que você tenha um seletor de webcams
-  
+    const videoElements = document.querySelectorAll('.video-webcam'); // Elementos de vídeo
+    const selectElement = document.getElementById('webcam-selector'); // Seletor de webcams
+    
+    // Função para acessar as webcams
     navigator.mediaDevices.enumerateDevices()
-      .then(devices => {
-        const videoDevices = devices.filter(device => device.kind === 'videoinput');
-  
-        videoDevices.forEach(device => {
-          const option = document.createElement('option');
-          option.value = device.deviceId;
-          option.text = device.label || `Câmera ${videoDevices.indexOf(device) + 1}`;
-          selectElement.appendChild(option);
+        .then(devices => {
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+    
+            // Preenche o seletor de webcams com as câmeras disponíveis
+            videoDevices.forEach((device, index) => {
+                const option = document.createElement('option');
+                option.value = device.deviceId;
+                option.text = device.label || `Câmera ${index + 1}`;
+                selectElement.appendChild(option);
+            });
+    
+            // Evento que muda a webcam ao selecionar uma diferente
+            selectElement.addEventListener('change', (event) => {
+                const deviceId = event.target.value;
+                startStream(deviceId); // Função que começa a exibir a webcam
+            });
+    
+            // Inicia o stream com a primeira webcam disponível por padrão
+            if (videoDevices.length > 0) {
+                startStream(videoDevices[0].deviceId);
+            }
+        })
+        .catch(err => {
+            console.error('Erro ao listar dispositivos de vídeo:', err);
         });
-  
-        selectElement.addEventListener('change', (event) => {
-          const deviceId = event.target.value;
-          navigator.mediaDevices.getUserMedia({ video: { deviceId } })
+    
+    // Função que inicia o stream da webcam selecionada
+    function startStream(deviceId) {
+        navigator.mediaDevices.getUserMedia({ video: { deviceId } })
             .then(stream => {
-              videoElements.forEach(video => {
-                video.srcObject = stream;
-              });
+                videoElements.forEach(video => {
+                    video.srcObject = stream; // Define o stream em todos os vídeos
+                });
             })
             .catch(err => {
-              console.error('Erro ao acessar a webcam:', err);
+                console.error('Erro ao acessar a webcam:', err);
             });
-        });
-      });
+    }
+    
 </script>
 
 {% endblock %}
