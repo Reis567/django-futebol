@@ -1,0 +1,177 @@
+.transmissao-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr; /* Três colunas: casa, central, visitante */
+    gap: 20px;
+    padding: 20px;
+    height: 100vh;
+}
+
+.time {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.time-nome {
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.jogadores {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.jogador {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #ccc;
+    padding: 8px 18px;
+    margin-bottom: 5px;
+    position: relative;
+}
+
+.numero-jogador {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+.central {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.periodo {
+    font-size: 1.5rem;
+    background-color: #8B4513; /* Marrom */
+    color: white;
+    padding: 3px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 5px;
+    width: 10%; /* Largura total */
+    text-align: center;
+}
+
+.placar {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px; /* Espaçamento entre os placares e o cronômetro */
+}
+
+.placar h1 {
+    font-size: 2.5rem;
+    margin: 0;
+}
+
+.cronometro {
+    font-size: 2rem;
+    background-color: #8B4513; /* Marrom */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+.webcams-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+
+}
+
+#webcam-selector-1,#webcam-selector-2 {
+    padding: 5px;
+    font-size: 10px;
+}
+.webcam-selectors{
+    display: flex;
+}
+
+.webcams-row {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.webcam {
+    width: 320px;
+    height: 240px;
+    background-color: #000;
+}
+
+.video-webcam {
+    width: 100%;
+    height: 100%;
+}
+
+
+
+.patrocinadores {
+    width: 100%; /* Ocupar a largura das webcams */
+    text-align: center;
+    height: 300px;
+    background-color: #f2f2f2;
+    margin-top: 5px;
+}
+
+.tecnico,
+.banco {
+    margin-top: 20px;
+}
+
+.competicao {
+    font-size: 1rem;
+    text-align: center;
+    margin-block: 10px;
+    background-color: #8B4513; /* Marrom */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+.drop-area {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 150px; /* Defina uma largura menor */
+    height: 50px; 
+}
+.icones-acoes {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.icone-acao {
+    width: 50px;
+    height: 50px;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    cursor: grab;
+}
+.icone-substituicao {
+    width: 20px;
+    margin-left: 5px;
+}
+.carousel-item img{
+    max-height: 250px;
+}    
