@@ -1,3 +1,11 @@
+/* Paleta de cores */
+:root {
+    --primary-color: #2e1a17; /* Marrom escuro */
+    --secondary-color: #795548; /* Marrom médio */
+    --accent-color: #f3ebe8; /* Marrom claro */
+}
+
+
 .transmissao-container {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr; /* Três colunas: casa, central, visitante */
@@ -51,7 +59,7 @@
 
 .periodo {
     font-size: 1.5rem;
-    background-color: #8B4513; /* Marrom */
+    background-color:var(--primary-color);
     color: white;
     padding: 3px;
     border-radius: 5px;
@@ -76,7 +84,7 @@
 
 .cronometro {
     font-size: 2rem;
-    background-color: #8B4513; /* Marrom */
+    background-color:var(--primary-color);
     color: white;
     padding: 10px 20px;
     border-radius: 5px;
@@ -133,7 +141,7 @@
     font-size: 1rem;
     text-align: center;
     margin-block: 10px;
-    background-color: #8B4513; /* Marrom */
+    background-color:var(--primary-color);
     color: white;
     padding: 5px 10px;
     border-radius: 5px;
