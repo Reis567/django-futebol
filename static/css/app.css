@@ -40,3 +40,13 @@ body {
     background-color: var(--accent-color) !important;
     margin-left: 70px;
 }
+.sidebar{
+    background-color: var(--primary-color) !important;
+
+}
+.sidebar a {
+    color: var(--accent-color) !important;
+}
+.openbtn{
+    background-color: var(--primary-color) !important;
+}
