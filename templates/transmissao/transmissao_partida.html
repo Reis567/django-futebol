@@ -93,9 +93,12 @@
 
     }
     
-    #webcam-selector {
+    #webcam-selector-1,#webcam-selector-2 {
         padding: 5px;
         font-size: 10px;
+    }
+    .webcam-selectors{
+        display: flex;
     }
     
     .webcams-row {
@@ -226,10 +229,12 @@
         <p>{{ partida.competicao.nome }}</p>
     </div>
     <div class="webcams-container">
-        <!-- Seletor de webcams -->
-        <select id="webcam-selector"></select>
-        
-        <!-- Row que contém as duas webcams -->
+        <div class="webcam-selectors">
+            <select id="webcam-selector-1"></select>
+
+            <select id="webcam-selector-2"></select>
+        </div>
+
         <div class="webcams-row">
             <div class="webcam" id="webcam1">
                 <video autoplay playsinline id="video1" class="video-webcam"></video>
@@ -239,6 +244,7 @@
             </div>
         </div>
     </div>
+    
     
     
     
@@ -476,36 +482,34 @@
 
 <!--WEBCAMS-->
 <script>
-    const videoElements = document.querySelectorAll('.video-webcam'); // Elementos de vídeo
-    const selectElement = document.getElementById('webcam-selector'); // Seletor de webcams
+    const webcamSelectors = [document.getElementById('webcam-selector-1'), document.getElementById('webcam-selector-2')];
+    const videoElements = [document.getElementById('video1'), document.getElementById('video2')];
     
-    // Função para acessar as webcams
-    navigator.mediaDevices.enumerateDevices()
-        .then(devices => {
-            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+    navigator.mediaDevices.enumerateDevices().then(devices => {
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
     
-            // Preenche o seletor de webcams com as câmeras disponíveis
-            videoDevices.forEach((device, index) => {
+        videoDevices.forEach((device, index) => {
+            webcamSelectors.forEach(selector => {
                 const option = document.createElement('option');
                 option.value = device.deviceId;
                 option.text = device.label || `Câmera ${index + 1}`;
-                selectElement.appendChild(option);
+                selector.appendChild(option);
             });
-    
-            // Evento que muda a webcam ao selecionar uma diferente
-            selectElement.addEventListener('change', (event) => {
-                const deviceId = event.target.value;
-                startStream(deviceId); // Função que começa a exibir a webcam
-            });
-    
-            // Inicia o stream com a primeira webcam disponível por padrão
-            if (videoDevices.length > 0) {
-                startStream(videoDevices[0].deviceId);
-            }
-        })
-        .catch(err => {
-            console.error('Erro ao listar dispositivos de vídeo:', err);
         });
+    
+        webcamSelectors.forEach((selector, index) => {
+            selector.addEventListener('change', event => {
+                const deviceId = event.target.value;
+                navigator.mediaDevices.getUserMedia({ video: { deviceId } })
+                    .then(stream => {
+                        videoElements[index].srcObject = stream;
+                    })
+                    .catch(err => {
+                        console.error('Erro ao acessar a webcam:', err);
+                    });
+            });
+        });
+    });
     
     // Função que inicia o stream da webcam selecionada
     function startStream(deviceId) {
