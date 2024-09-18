@@ -434,4 +434,40 @@
 
 
 </script>
+
+
+
+
+
+<!--WEBCAMS-->
+<script>
+    const videoElements = document.querySelectorAll('.webcam');
+    const selectElement = document.getElementById('webcam-selector'); // Supondo que você tenha um seletor de webcams
+  
+    navigator.mediaDevices.enumerateDevices()
+      .then(devices => {
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+  
+        videoDevices.forEach(device => {
+          const option = document.createElement('option');
+          option.value = device.deviceId;
+          option.text = device.label || `Câmera ${videoDevices.indexOf(device) + 1}`;
+          selectElement.appendChild(option);
+        });
+  
+        selectElement.addEventListener('change', (event) => {
+          const deviceId = event.target.value;
+          navigator.mediaDevices.getUserMedia({ video: { deviceId } })
+            .then(stream => {
+              videoElements.forEach(video => {
+                video.srcObject = stream;
+              });
+            })
+            .catch(err => {
+              console.error('Erro ao acessar a webcam:', err);
+            });
+        });
+      });
+  </script>
+
 {% endblock %}
