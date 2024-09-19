@@ -99,12 +99,16 @@ def transmissao_partida(request, partida_id):
 
 
 def registrar_gol(request, jogador_id, partida_id, tipo_gol):
+    print(jogador_id)
+    print(partida_id)
+    print(tipo_gol)
     jogador = get_object_or_404(Jogador, id=jogador_id)
     partida = get_object_or_404(Partida, id=partida_id)
     
     gol_contra = True if tipo_gol == 'gol_contra' else False
 
-    tempo = request.POST.get('tempo', '') 
+    tempo = request.POST.get('tempo', '')
+    print(tempo)
 
     gol = Gol(jogador=jogador, partida=partida, gol_contra=gol_contra, tempo=tempo)
     gol.salvar_gol()  # Atualiza o placar e incrementa os gols do jogador

@@ -99,11 +99,11 @@
         </div>
 
         <div class="icones-acoes">
-            <div class="icone-acao" id="bola" draggable="true">⚽</div>
-            <div class="icone-acao" id="cartao-amarelo" draggable="true">🟨</div>
-            <div class="icone-acao" id="cartao-vermelho" draggable="true">🟥</div>
-            <div class="icone-acao" id="substituicao" draggable="true">🔄</div>
-            <div class="icone-acao" id="gol-contra" draggable="true">❌</div>
+            <div class="icone-acao" id="bola" draggable="true" data-tipo-gol="gol">⚽</div>
+            <div class="icone-acao" id="cartao-amarelo" draggable="true" data-tipo-gol="cartao_amarelo">🟨</div>
+            <div class="icone-acao" id="cartao-vermelho" draggable="true" data-tipo-gol="cartao_vermelho">🟥</div>
+            <div class="icone-acao" id="substituicao" draggable="true" data-tipo-gol="substituicao">🔄</div>
+            <div class="icone-acao" id="gol-contra" draggable="true" data-tipo-gol="gol_contra">❌</div>
 
             
         </div>
@@ -258,18 +258,18 @@
 
 <!--GOL E GOL CONTRA-->
 <script>
-
     const icones = document.querySelectorAll('.icone-acao');
     const jogadores = document.querySelectorAll('.jogador');
 
     // Adicionar os eventos de dragstart nos ícones
     icones.forEach(icone => {
         const tipoIcone = icone.id; // Verifica o id do ícone (bola, gol-contra, etc.)
-        
+
         // Só aplicar a lógica de arrastar para ícones de gol e gol contra
         if (tipoIcone === 'bola' || tipoIcone === 'gol-contra') {
             icone.addEventListener('dragstart', function (e) {
-                e.dataTransfer.setData('text/plain', this.dataset.tipoGol); // Passa o tipo do gol (ex: gol, gol_contra)
+                const tipoGol = this.getAttribute('data-tipo-gol'); // Obtém o tipo de gol
+                e.dataTransfer.setData('text/plain', tipoGol); // Passa o tipo do gol (ex: gol, gol_contra)
             });
         }
     });
@@ -286,16 +286,20 @@
         dropArea.addEventListener('drop', function (e) {
             e.preventDefault();
             const tipoGol = e.dataTransfer.getData('text/plain'); // Pega o tipo do gol arrastado
+            if (!tipoGol) {
+                console.error('Tipo de gol indefinido!');
+                return;
+            }
+
             const jogadorId = jogador.getAttribute('data-jogador-id'); // Pega o ID do jogador
             const partidaId = {{ partida.id }}; // Pega o ID da partida
 
-            const iconeHtml = e.dataTransfer.getData('text/plain'); // Pega o ícone que foi arrastado
             const nomeJogador = jogador.querySelector('.nome-jogador');
 
             // Criar um elemento de ícone para ser adicionado ao jogador
             const novoIcone = document.createElement('span');
             novoIcone.classList.add('icone-substituicao');
-            novoIcone.innerHTML = iconeHtml; // Define o ícone
+            novoIcone.textContent = tipoGol === 'gol' ? '⚽' : '❌'; // Define o ícone
             novoIcone.dataset.tipoGol = tipoGol; // Armazena o tipo de gol no ícone
 
             // Adicionar evento para remover o ícone ao clicar
@@ -349,8 +353,8 @@
             });
         });
     });
-
 </script>
+
 
 
 
