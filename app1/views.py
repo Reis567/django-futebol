@@ -116,23 +116,15 @@ def transmissao_partida(request, partida_id):
     return render(request, 'transmissao/transmissao_partida.html', context)
 
 def registrar_gol_na_partida(jogador, partida, tipo_gol, tempo_completo, tipo_time):
-    """
-    Função que realiza o registro do gol, atualiza o placar e as estatísticas do jogador.
-    `tipo_time`: 'casa' ou 'visitante' para indicar o time do jogador.
-    """
     gol_contra = tipo_gol == 'gol_contra'
-    
-    # Cria a instância do gol
+
     gol = Gol(
         jogador=jogador,
         partida=partida,
         gol_contra=gol_contra,
         tempo=tempo_completo
     )
-    
-    # Atualiza as estatísticas do jogador e o placar da partida
     if not gol_contra:
-        # Gol a favor do jogador, incrementa no time correto (casa ou visitante)
         jogador.adicionar_gol()
         jogador.save()
 
@@ -142,17 +134,29 @@ def registrar_gol_na_partida(jogador, partida, tipo_gol, tempo_completo, tipo_ti
             partida.incrementar_placar_visitante()
 
     else:
-        # Gol contra, incrementa no time adversário
         if tipo_time == 'casa':
             partida.incrementar_placar_visitante()
         else:
             partida.incrementar_placar_casa()
-
-    # Salva o gol e a partida
     gol.save()
     partida.save()
+    return partida
 
-    return partida 
+def remover_registro_gol(partida, gol, tipo_time):
+    if gol.gol_contra:
+        if tipo_time == 'casa':
+            partida.placar_visitante -= 1
+        else:
+            partida.placar_casa -= 1
+    else:
+        if tipo_time == 'casa':
+            partida.placar_casa -= 1 
+        else:
+            partida.placar_visitante -= 1 
+
+    partida.save() 
+
+    return partida.placar_casa, partida.placar_visitante
 
 
 def registrar_gol(request, jogador_id, partida_id, tipo_gol):
@@ -163,8 +167,6 @@ def registrar_gol(request, jogador_id, partida_id, tipo_gol):
     tempo_completo = data.get('tempo')
     tipo_time = data.get('tipo_time')
     print(tipo_time)
-
-    # Usar a função de registro de gol para atualizar os dados
     partida_atualizada = registrar_gol_na_partida(jogador, partida, tipo_gol, tempo_completo, tipo_time)
 
     return JsonResponse({
@@ -178,45 +180,22 @@ def remover_gol(request, jogador_id, partida_id, tipo_gol):
     try:
         data = json.loads(request.body.decode('utf-8'))
         tipo_time = data.get('tipo_time')
-        
         gol = Gol.objects.filter(
             jogador_id=jogador_id, 
             partida_id=partida_id, 
             gol_contra=(tipo_gol == 'gol_contra')
         ).order_by('-id').first()
-
         if not gol:
             return JsonResponse({'error': 'Gol não encontrado'}, status=404)
-
         partida = gol.partida
+        placar_casa, placar_visitante = remover_registro_gol(partida, gol, tipo_time)
 
-        # Atualiza o placar corretamente antes de deletar o gol
-        if gol.gol_contra:
-            # Gol contra do time da casa
-            if tipo_time == 'casa':
-                partida.placar_visitante -= 1  # Remove do placar visitante
-            else:
-                partida.placar_casa -= 1  # Remove do placar da casa se for visitante
-        else:
-            # Gol a favor do time
-            if tipo_time == 'casa':
-                partida.placar_casa -= 1  # Remove do placar da casa
-            else:
-                partida.placar_visitante -= 1  # Remove do placar visitante
-
-        # Deletar o gol
         gol.delete()
-
-        # Salvar a partida com o placar atualizado
-        partida.save()
-
-        # Retornar o novo placar atualizado
         return JsonResponse({
             'success': True,
-            'placar_casa': partida.placar_casa,
-            'placar_visitante': partida.placar_visitante,
+            'placar_casa': placar_casa,
+            'placar_visitante': placar_visitante,
         })
-
     except Gol.DoesNotExist:
         return JsonResponse({'error': 'Gol não encontrado'}, status=404)
 
