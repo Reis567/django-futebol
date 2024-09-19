@@ -44,9 +44,15 @@
     <div class="central">
         <div class="periodo" id="periodo">1T</div> <!-- Div para alternar o período -->
         <div class="placar">
-            <h1>{{ partida.time_casa.sigla }} {{ partida.placar_casa }}</h1>
+            <h1>
+                {{ partida.time_casa.sigla }}
+                <span class="placar-casa">{{ partida.placar_casa }}</span>
+            </h1>
             <div class="cronometro" id="cronometro">00:00</div>
-            <h1>{{ partida.placar_visitante }} {{ partida.time_visitante.sigla }}</h1>
+            <h1>
+                <span class="placar-visitante">{{ partida.placar_visitante }}</span>
+                {{ partida.time_visitante.sigla }}
+            </h1>
         </div>
         <div class="competicao">
             <p>{{ partida.competicao.nome }}</p>
