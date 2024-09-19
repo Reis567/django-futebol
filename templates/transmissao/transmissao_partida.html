@@ -12,7 +12,7 @@
         <h2 class="time-nome">{{ partida.time_casa.nome }}</h2>
         <div class="jogadores">
             {% for jogador in titulares_casa %}
-                <div class="jogador" data-jogador-id="{{ jogador.id }}" data-tipo="casa">
+                <div class="jogador" data-jogador-id="{{ jogador.id }}" data-time="casa">
 
                     <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                     <div class="nome-jogador">{{ jogador.nome }}</div>
@@ -25,7 +25,7 @@
             <h3>Banco de Reservas</h3>
             <div class="jogadores">
                 {% for jogador in banco_casa %}
-                    <div class="jogador" data-jogador-id="{{ jogador.id }}" data-tipo="casa">
+                    <div class="jogador" data-jogador-id="{{ jogador.id }}" data-time="casa">
 
                         <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                         <div class="nome-jogador">{{ jogador.nome }}</div>

@@ -115,35 +115,62 @@ def transmissao_partida(request, partida_id):
 
     return render(request, 'transmissao/transmissao_partida.html', context)
 
+def registrar_gol_na_partida(jogador, partida, tipo_gol, tempo_completo, tipo_time):
+    """
+    Função que realiza o registro do gol, atualiza o placar e as estatísticas do jogador.
+    `tipo_time`: 'casa' ou 'visitante' para indicar o time do jogador.
+    """
+    gol_contra = tipo_gol == 'gol_contra'
+    
+    # Cria a instância do gol
+    gol = Gol(
+        jogador=jogador,
+        partida=partida,
+        gol_contra=gol_contra,
+        tempo=tempo_completo
+    )
+    
+    # Atualiza as estatísticas do jogador e o placar da partida
+    if not gol_contra:
+        # Gol a favor do jogador, incrementa no time correto (casa ou visitante)
+        jogador.adicionar_gol()
+        jogador.save()
 
+        if tipo_time == 'casa':
+            partida.incrementar_placar_casa()
+        else:
+            partida.incrementar_placar_visitante()
+
+    else:
+        # Gol contra, incrementa no time adversário
+        if tipo_time == 'casa':
+            partida.incrementar_placar_visitante()
+        else:
+            partida.incrementar_placar_casa()
+
+    # Salva o gol e a partida
+    gol.save()
+    partida.save()
+
+    return partida 
 
 
 def registrar_gol(request, jogador_id, partida_id, tipo_gol):
-    print(jogador_id)
-    print(partida_id)
-    print(tipo_gol)
     jogador = get_object_or_404(Jogador, id=jogador_id)
     partida = get_object_or_404(Partida, id=partida_id)
-    
-    gol_contra = True if tipo_gol == 'gol_contra' else False
 
     data = json.loads(request.body.decode('utf-8'))
-
     tempo_completo = data.get('tempo')
     tipo_time = data.get('tipo_time')
     print(tipo_time)
-    gol = Gol(jogador=jogador, partida=partida, gol_contra=gol_contra, tempo=tempo_completo)
-    print(gol)
-    gol.salvar_gol()  # Atualiza o placar e incrementa os gols do jogador
-    gol.save()
 
-
-    partida.save()
+    # Usar a função de registro de gol para atualizar os dados
+    partida_atualizada = registrar_gol_na_partida(jogador, partida, tipo_gol, tempo_completo, tipo_time)
 
     return JsonResponse({
         'status': 'success',
-        'placar_casa': partida.placar_casa,
-        'placar_visitante': partida.placar_visitante
+        'placar_casa': partida_atualizada.placar_casa,
+        'placar_visitante': partida_atualizada.placar_visitante
     })
 
 
