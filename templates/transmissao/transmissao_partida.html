@@ -256,6 +256,107 @@
 
 
 
+<!--GOL E GOL CONTRA-->
+<script>
+
+    const icones = document.querySelectorAll('.icone-acao');
+    const jogadores = document.querySelectorAll('.jogador');
+
+    // Adicionar os eventos de dragstart nos ícones
+    icones.forEach(icone => {
+        const tipoIcone = icone.id; // Verifica o id do ícone (bola, gol-contra, etc.)
+        
+        // Só aplicar a lógica de arrastar para ícones de gol e gol contra
+        if (tipoIcone === 'bola' || tipoIcone === 'gol-contra') {
+            icone.addEventListener('dragstart', function (e) {
+                e.dataTransfer.setData('text/plain', this.dataset.tipoGol); // Passa o tipo do gol (ex: gol, gol_contra)
+            });
+        }
+    });
+
+    jogadores.forEach(jogador => {
+        const dropArea = jogador.querySelector('.drop-area');
+
+        // Permitir o drop
+        dropArea.addEventListener('dragover', function (e) {
+            e.preventDefault(); // Necessário para permitir o drop
+        });
+
+        // Lidar com o drop
+        dropArea.addEventListener('drop', function (e) {
+            e.preventDefault();
+            const tipoGol = e.dataTransfer.getData('text/plain'); // Pega o tipo do gol arrastado
+            const jogadorId = jogador.getAttribute('data-jogador-id'); // Pega o ID do jogador
+            const partidaId = {{ partida.id }}; // Pega o ID da partida
+
+            const iconeHtml = e.dataTransfer.getData('text/plain'); // Pega o ícone que foi arrastado
+            const nomeJogador = jogador.querySelector('.nome-jogador');
+
+            // Criar um elemento de ícone para ser adicionado ao jogador
+            const novoIcone = document.createElement('span');
+            novoIcone.classList.add('icone-substituicao');
+            novoIcone.innerHTML = iconeHtml; // Define o ícone
+            novoIcone.dataset.tipoGol = tipoGol; // Armazena o tipo de gol no ícone
+
+            // Adicionar evento para remover o ícone ao clicar
+            novoIcone.addEventListener('click', function() {
+                // Remover o ícone da interface
+                nomeJogador.removeChild(novoIcone);
+
+                // Realizar o fetch para deletar o gol no banco de dados
+                fetch(`/remover_gol/${jogadorId}/${partidaId}/${tipoGol}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'  // Necessário para requisições DELETE no Django
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Gol removido com sucesso:', data);
+                    // Atualize o placar exibido na página, se necessário
+                    document.querySelector('.placar-casa').textContent = data.placar_casa;
+                    document.querySelector('.placar-visitante').textContent = data.placar_visitante;
+                })
+                .catch(error => {
+                    console.error('Erro ao remover o gol:', error);
+                });
+            });
+
+            // Adiciona o ícone ao lado direito do nome do jogador
+            nomeJogador.appendChild(novoIcone);
+
+            // Realizar o fetch para registrar o gol
+            fetch(`/registrar_gol/${jogadorId}/${partidaId}/${tipoGol}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'  // Necessário para requisições POST no Django
+                },
+                body: JSON.stringify({
+                    tempo: '45:00/2T' // Você pode atualizar isso para capturar o tempo real do gol
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Gol registrado com sucesso:', data);
+                // Atualize o placar exibido na página, se necessário
+                document.querySelector('.placar-casa').textContent = data.placar_casa;
+                document.querySelector('.placar-visitante').textContent = data.placar_visitante;
+            })
+            .catch(error => {
+                console.error('Erro ao registrar o gol:', error);
+            });
+        });
+    });
+
+</script>
+
+
+
+
+
+
 
 <!--ACOES -->
 <script>
@@ -352,5 +453,8 @@
     }
     
 </script>
+
+
+
 
 {% endblock %}
