@@ -254,8 +254,6 @@
 
 
 
-
-
 <!--GOL E GOL CONTRA-->
 <script>
     const icones = document.querySelectorAll('.icone-acao');
@@ -296,6 +294,11 @@
 
             const nomeJogador = jogador.querySelector('.nome-jogador');
 
+            // Capturar o tempo atual do cronômetro e o período
+            const tempoAtual = document.getElementById('cronometro').textContent; // Captura o tempo do cronômetro
+            console.log(tempoAtual)
+            const periodoAtual = document.getElementById('periodo').textContent; // Captura o período (1T, 2T, etc.)
+            console.log(periodoAtual)
             // Criar um elemento de ícone para ser adicionado ao jogador
             const novoIcone = document.createElement('span');
             novoIcone.classList.add('icone-substituicao');
@@ -338,7 +341,7 @@
                     'X-CSRFToken': '{{ csrf_token }}'  // Necessário para requisições POST no Django
                 },
                 body: JSON.stringify({
-                    tempo: '45:00/2T' // Você pode atualizar isso para capturar o tempo real do gol
+                    tempo: `${tempoAtual}/${periodoAtual}`  // Envia o tempo e o período
                 })
             })
             .then(response => response.json())
@@ -354,7 +357,6 @@
         });
     });
 </script>
-
 
 
 

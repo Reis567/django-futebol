@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.db.models import Count, Q
 from django.db.models import Case, When, IntegerField
 from django.http import JsonResponse
-
+import json
 from django.views.decorators.http import require_http_methods
 
 
@@ -107,25 +107,14 @@ def registrar_gol(request, jogador_id, partida_id, tipo_gol):
     
     gol_contra = True if tipo_gol == 'gol_contra' else False
 
-    tempo = request.POST.get('tempo', '')
-    print(tempo)
+    data = json.loads(request.body.decode('utf-8'))
 
-    gol = Gol(jogador=jogador, partida=partida, gol_contra=gol_contra, tempo=tempo)
+    tempo_completo = data.get('tempo') 
+    gol = Gol(jogador=jogador, partida=partida, gol_contra=gol_contra, tempo=tempo_completo)
+    print(gol)
     gol.salvar_gol()  # Atualiza o placar e incrementa os gols do jogador
     gol.save()
 
-    if gol_contra:
-
-        if jogador.time == partida.time_casa:
-            partida.incrementar_placar_visitante()
-        else:
-            partida.incrementar_placar_casa()
-    else:
-
-        if jogador.time == partida.time_casa:
-            partida.incrementar_placar_casa()
-        else:
-            partida.incrementar_placar_visitante()
 
     partida.save()
 
