@@ -5,6 +5,15 @@ from django.db.models import Count, Q
 from django.db.models import Case, When, IntegerField
 from django.http import JsonResponse
 
+from django.views.decorators.http import require_http_methods
+
+
+
+
+
+
+
+
 def home(request):
     # Contando corretamente os jogadores titulares e os do banco para cada time
     times = Time.objects.annotate(
@@ -121,3 +130,25 @@ def registrar_gol(request, jogador_id, partida_id, tipo_gol):
         'placar_casa': partida.placar_casa,
         'placar_visitante': partida.placar_visitante
     })
+
+
+
+@require_http_methods(["DELETE"])
+def remover_gol(request, jogador_id, partida_id, tipo_gol):
+    try:
+        # Filtrar o gol baseado no jogador, partida e tipo
+        gol = Gol.objects.get(jogador_id=jogador_id, partida_id=partida_id, gol_contra=(tipo_gol == 'gol_contra'))
+        gol.delete()
+
+        # Retornar o novo placar atualizado, se necessário
+        placar_casa = Gol.objects.filter(partida_id=partida_id, jogador__time=gol.partida.time_casa, gol_contra=False).count()
+        placar_visitante = Gol.objects.filter(partida_id=partida_id, jogador__time=gol.partida.time_visitante, gol_contra=False).count()
+
+        return JsonResponse({
+            'success': True,
+            'placar_casa': placar_casa,
+            'placar_visitante': placar_visitante,
+        })
+
+    except Gol.DoesNotExist:
+        return JsonResponse({'error': 'Gol não encontrado'}, status=404)
