@@ -3,7 +3,7 @@ from .models import *
 from django.shortcuts import redirect
 from django.db.models import Count, Q
 from django.db.models import Case, When, IntegerField
-
+from django.http import JsonResponse
 
 def home(request):
     # Contando corretamente os jogadores titulares e os do banco para cada time
@@ -85,3 +85,39 @@ def transmissao_partida(request, partida_id):
     }
 
     return render(request, 'transmissao/transmissao_partida.html', context)
+
+
+
+
+def registrar_gol(request, jogador_id, partida_id, tipo_gol):
+    jogador = get_object_or_404(Jogador, id=jogador_id)
+    partida = get_object_or_404(Partida, id=partida_id)
+    
+    gol_contra = True if tipo_gol == 'gol_contra' else False
+
+    tempo = request.POST.get('tempo', '') 
+
+    gol = Gol(jogador=jogador, partida=partida, gol_contra=gol_contra, tempo=tempo)
+    gol.salvar_gol()  # Atualiza o placar e incrementa os gols do jogador
+    gol.save()
+
+    if gol_contra:
+
+        if jogador.time == partida.time_casa:
+            partida.incrementar_placar_visitante()
+        else:
+            partida.incrementar_placar_casa()
+    else:
+
+        if jogador.time == partida.time_casa:
+            partida.incrementar_placar_casa()
+        else:
+            partida.incrementar_placar_visitante()
+
+    partida.save()
+
+    return JsonResponse({
+        'status': 'success',
+        'placar_casa': partida.placar_casa,
+        'placar_visitante': partida.placar_visitante
+    })

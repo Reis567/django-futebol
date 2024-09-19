@@ -89,6 +89,7 @@ class Partida(models.Model):
 class Gol(models.Model):
     jogador = models.ForeignKey(Jogador, on_delete=models.CASCADE, related_name='gols_partida')
     partida = models.ForeignKey(Partida, on_delete=models.CASCADE, related_name='gols')
+    gol_contra = models.BooleanField(default=False)
     tempo = models.CharField(max_length=10, null=True, blank=True)  # Formato: XX:XX/2T
 
     def __str__(self):
