@@ -95,28 +95,3 @@ class Gol(models.Model):
     def __str__(self):
         return f'Gol de {self.jogador.nome} aos {self.tempo}'
 
-    def salvar_gol(self):
-        """
-        Método para salvar o gol e atualizar as estatísticas do jogador e o placar da partida.
-        """
-        # Incrementa o número total de gols do jogador (somente se não for gol contra)
-        if not self.gol_contra:
-            self.jogador.adicionar_gol()
-            self.jogador.save()
-
-        # Atualiza o placar da partida
-        if self.gol_contra:
-            # Se for gol contra, incrementa o placar do time adversário
-            if self.jogador.time == self.partida.time_casa:
-                self.partida.incrementar_placar_visitante()
-            else:
-                self.partida.incrementar_placar_casa()
-        else:
-            # Se for gol a favor, incrementa o placar do time do jogador
-            if self.jogador.time == self.partida.time_casa:
-                self.partida.incrementar_placar_casa()
-            else:
-                self.partida.incrementar_placar_visitante()
-
-        # Salva as mudanças na partida
-        self.partida.save()

@@ -173,24 +173,52 @@ def registrar_gol(request, jogador_id, partida_id, tipo_gol):
         'placar_visitante': partida_atualizada.placar_visitante
     })
 
-
-
 @require_http_methods(["DELETE"])
 def remover_gol(request, jogador_id, partida_id, tipo_gol):
     try:
-        # Filtrar o gol baseado no jogador, partida e tipo
-        gol = Gol.objects.get(jogador_id=jogador_id, partida_id=partida_id, gol_contra=(tipo_gol == 'gol_contra'))
+        data = json.loads(request.body.decode('utf-8'))
+        tipo_time = data.get('tipo_time')
+        
+        gol = Gol.objects.filter(
+            jogador_id=jogador_id, 
+            partida_id=partida_id, 
+            gol_contra=(tipo_gol == 'gol_contra')
+        ).order_by('-id').first()
+
+        if not gol:
+            return JsonResponse({'error': 'Gol não encontrado'}, status=404)
+
+        partida = gol.partida
+
+        # Atualiza o placar corretamente antes de deletar o gol
+        if gol.gol_contra:
+            # Gol contra do time da casa
+            if tipo_time == 'casa':
+                partida.placar_visitante -= 1  # Remove do placar visitante
+            else:
+                partida.placar_casa -= 1  # Remove do placar da casa se for visitante
+        else:
+            # Gol a favor do time
+            if tipo_time == 'casa':
+                partida.placar_casa -= 1  # Remove do placar da casa
+            else:
+                partida.placar_visitante -= 1  # Remove do placar visitante
+
+        # Deletar o gol
         gol.delete()
 
-        # Retornar o novo placar atualizado, se necessário
-        placar_casa = Gol.objects.filter(partida_id=partida_id, jogador__time=gol.partida.time_casa, gol_contra=False).count()
-        placar_visitante = Gol.objects.filter(partida_id=partida_id, jogador__time=gol.partida.time_visitante, gol_contra=False).count()
+        # Salvar a partida com o placar atualizado
+        partida.save()
 
+        # Retornar o novo placar atualizado
         return JsonResponse({
             'success': True,
-            'placar_casa': placar_casa,
-            'placar_visitante': placar_visitante,
+            'placar_casa': partida.placar_casa,
+            'placar_visitante': partida.placar_visitante,
         })
 
     except Gol.DoesNotExist:
         return JsonResponse({'error': 'Gol não encontrado'}, status=404)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
