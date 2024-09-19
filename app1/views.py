@@ -56,6 +56,7 @@ def selecionar_partida(request):
     return render(request, 'transmissao/selecionar_partida.html', {'times': times, 'competicoes': competicoes})
 
 
+
 def transmissao_partida(request, partida_id):
     partida = get_object_or_404(Partida, id=partida_id)
 
@@ -85,12 +86,31 @@ def transmissao_partida(request, partida_id):
         posicao_ordenada=ordem_posicao
     ).order_by('posicao_ordenada')
 
+    # Buscar os gols da partida
+    gols_casa = Gol.objects.filter(partida=partida, jogador__in=titulares_casa)
+    gols_visitante = Gol.objects.filter(partida=partida, jogador__in=titulares_visitante)
+
+    # Organizar os gols por jogador
+    gols_por_jogador_casa = {}
+    for gol in gols_casa:
+        if gol.jogador.id not in gols_por_jogador_casa:
+            gols_por_jogador_casa[gol.jogador.id] = []
+        gols_por_jogador_casa[gol.jogador.id].append(gol)
+
+    gols_por_jogador_visitante = {}
+    for gol in gols_visitante:
+        if gol.jogador.id not in gols_por_jogador_visitante:
+            gols_por_jogador_visitante[gol.jogador.id] = []
+        gols_por_jogador_visitante[gol.jogador.id].append(gol)
+
     context = {
         'partida': partida,
         'titulares_casa': titulares_casa,
         'banco_casa': banco_casa,
         'titulares_visitante': titulares_visitante,
         'banco_visitante': banco_visitante,
+        'gols_por_jogador_casa': gols_por_jogador_casa,
+        'gols_por_jogador_visitante': gols_por_jogador_visitante,
     }
 
     return render(request, 'transmissao/transmissao_partida.html', context)
