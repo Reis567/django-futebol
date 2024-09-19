@@ -129,7 +129,9 @@ def registrar_gol(request, jogador_id, partida_id, tipo_gol):
 
     data = json.loads(request.body.decode('utf-8'))
 
-    tempo_completo = data.get('tempo') 
+    tempo_completo = data.get('tempo')
+    tipo_time = data.get('tipo_time')
+    print(tipo_time)
     gol = Gol(jogador=jogador, partida=partida, gol_contra=gol_contra, tempo=tempo_completo)
     print(gol)
     gol.salvar_gol()  # Atualiza o placar e incrementa os gols do jogador
