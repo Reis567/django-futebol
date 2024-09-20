@@ -201,3 +201,26 @@ def remover_gol(request, jogador_id, partida_id, tipo_gol):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+
+
+
+
+
+def time_detail(request, time_id):
+    # Recupera o time com o ID especificado ou retorna 404 se não encontrado
+    time = get_object_or_404(Time, id=time_id)
+
+    # Recupera os jogadores titulares e do banco associados ao time
+    jogadores_titulares = time.jogadores_titulares.all()
+    jogadores_banco = time.jogadores_banco.all()
+
+    # Contexto para ser passado ao template
+    context = {
+        'time': time,
+        'jogadores_titulares': jogadores_titulares,
+        'jogadores_banco': jogadores_banco,
+    }
+
+    return render(request, 'time/time_detail.html', context)
