@@ -1,0 +1,35 @@
+<h1>Detalhes do Time: {{ time.nome }}</h1>
+
+<p><strong>Sigla:</strong> {{ time.sigla }}</p>
+<p><strong>Técnico:</strong> {{ time.tecnico }}</p>
+
+<h2>Jogadores Titulares</h2>
+<ul>
+    {% for jogador in jogadores_titulares %}
+    <li>
+        {{ jogador.nome }} - Camisa {{ jogador.numero_camisa }} ({{ jogador.get_posicao_display }})
+        <ul>
+            <li>Gols: {{ jogador.total_gols }}</li>
+            <li>Cartões Amarelos: {{ jogador.cartoes_amarelos }}</li>
+            <li>Cartão Vermelho: {{ jogador.cartao_vermelho|yesno:"Sim,Não" }}</li>
+        </ul>
+    </li>
+    {% endfor %}
+</ul>
+
+<h2>Jogadores no Banco</h2>
+<ul>
+    {% for jogador in jogadores_banco %}
+    <li>
+        {{ jogador.nome }} - Camisa {{ jogador.numero_camisa }} ({{ jogador.get_posicao_display }})
+        <ul>
+            <li>Gols: {{ jogador.total_gols }}</li>
+            <li>Cartões Amarelos: {{ jogador.cartoes_amarelos }}</li>
+            <li>Cartão Vermelho: {{ jogador.cartao_vermelho|yesno:"Sim,Não" }}</li>
+        </ul>
+    </li>
+    {% endfor %}
+</ul>
+
+<h2>Gerenciar Jogadores</h2>
+<a href="{% url 'adicionar_jogador' time.id %}">Adicionar Jogador</a>
