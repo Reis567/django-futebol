@@ -75,20 +75,28 @@ class Partida(models.Model):
         gols = self.gols.all()
 
         for gol in gols:
-            if gol.gol_contra:
-                # Gol contra: Soma um gol para o time adversário
-                if gol.jogador.time == self.time_casa:
+            if gol.gol_tipo == 'CASA':
+                if gol.gol_contra:
                     self.placar_visitante += 1
                 else:
                     self.placar_casa += 1
-            else:
-                # Gol normal: Soma um gol para o time do jogador
-                if gol.jogador.time == self.time_casa:
+            elif gol.gol_tipo == 'VISITANTE':
+                if gol.gol_contra:
                     self.placar_casa += 1
                 else:
                     self.placar_visitante += 1
+            else:  # Se gol_tipo não estiver definido, utilizar a lógica anterior
+                if gol.gol_contra:
+                    if gol.jogador.time == self.time_casa:
+                        self.placar_visitante += 1
+                    else:
+                        self.placar_casa += 1
+                else:
+                    if gol.jogador.time == self.time_casa:
+                        self.placar_casa += 1
+                    else:
+                        self.placar_visitante += 1
 
-        # Salva o placar atualizado
         self.save()
 
 
