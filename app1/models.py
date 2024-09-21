@@ -76,16 +76,22 @@ class Partida(models.Model):
 
         for gol in gols:
             if gol.gol_contra:
+                # Gol contra: Soma um gol para o time adversário
                 if gol.jogador.time == self.time_casa:
                     self.placar_visitante += 1
                 else:
                     self.placar_casa += 1
             else:
+                # Gol normal: Soma um gol para o time do jogador
                 if gol.jogador.time == self.time_casa:
                     self.placar_casa += 1
                 else:
                     self.placar_visitante += 1
+
+        # Salva o placar atualizado
         self.save()
+
+
 
     def encerrar_jogo(self):
         self.status = 'FINALIZADA'
@@ -101,6 +107,11 @@ class Partida(models.Model):
 
 # Modelo para Gol
 class Gol(models.Model):
+    TIPO_GOL = [
+        ('CASA', 'casa'),
+        ('VISITANTE', 'visitante'),
+    ]
+    gol_tipo = models.CharField(max_length=15, choices=TIPO_GOL, null=True, blank=True)
     jogador = models.ForeignKey(Jogador, on_delete=models.CASCADE, related_name='gols_partida')
     partida = models.ForeignKey(Partida, on_delete=models.CASCADE, related_name='gols')
     gol_contra = models.BooleanField(default=False)
