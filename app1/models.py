@@ -69,17 +69,31 @@ class Partida(models.Model):
     ]
     status = models.CharField(max_length=15, choices=STATUS_PARTIDA, default='EM_ANDAMENTO')
 
-    def incrementar_placar_casa(self):
-        self.placar_casa += 1
+    def calcular_placar(self):
+        self.placar_casa = 0
+        self.placar_visitante = 0
+        gols = self.gols.all()
 
-    def incrementar_placar_visitante(self):
-        self.placar_visitante += 1
+        for gol in gols:
+            if gol.gol_contra:
+                if gol.jogador.time == self.time_casa:
+                    self.placar_visitante += 1
+                else:
+                    self.placar_casa += 1
+            else:
+                if gol.jogador.time == self.time_casa:
+                    self.placar_casa += 1
+                else:
+                    self.placar_visitante += 1
+        self.save()
 
     def encerrar_jogo(self):
         self.status = 'FINALIZADA'
+        self.save()
 
     def iniciar_intervalo(self):
         self.status = 'INTERVALO'
+        self.save()
 
     def __str__(self):
         return f'{self.time_casa.nome} vs {self.time_visitante.nome} - {self.competicao.nome}'
