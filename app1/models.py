@@ -85,7 +85,7 @@ class Partida(models.Model):
                     self.placar_casa += 1
                 else:
                     self.placar_visitante += 1
-            else:  # Se gol_tipo não estiver definido, utilizar a lógica anterior
+            else:  # Se gol_tipo não estiver definido
                 if gol.gol_contra:
                     if gol.jogador.time == self.time_casa:
                         self.placar_visitante += 1

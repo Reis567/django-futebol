@@ -115,32 +115,6 @@ def transmissao_partida(request, partida_id):
 
     return render(request, 'transmissao/transmissao_partida.html', context)
 
-def registrar_gol_na_partida(jogador, partida, tipo_gol, tempo_completo, tipo_time):
-    gol_contra = tipo_gol == 'gol_contra'
-
-    gol = Gol(
-        jogador=jogador,
-        partida=partida,
-        gol_contra=gol_contra,
-        tempo=tempo_completo
-    )
-    if not gol_contra:
-        jogador.adicionar_gol()
-        jogador.save()
-
-        if tipo_time == 'casa':
-            partida.incrementar_placar_casa()
-        else:
-            partida.incrementar_placar_visitante()
-
-    else:
-        if tipo_time == 'casa':
-            partida.incrementar_placar_visitante()
-        else:
-            partida.incrementar_placar_casa()
-    gol.save()
-    partida.save()
-    return partida
 
 def remover_registro_gol(partida, gol, tipo_time):
     if gol.gol_contra:
@@ -166,8 +140,16 @@ def registrar_gol(request, jogador_id, partida_id, tipo_gol):
     data = json.loads(request.body.decode('utf-8'))
     tempo_completo = data.get('tempo')
     tipo_time = data.get('tipo_time')
+    gol_contra = tipo_gol == 'gol_contra'
+
+    gol = Gol(
+        jogador=jogador,
+        partida=partida,
+        gol_contra=gol_contra,
+        tempo=tempo_completo
+    )
     print(tipo_time)
-    partida_atualizada = registrar_gol_na_partida(jogador, partida, tipo_gol, tempo_completo, tipo_time)
+
 
     return JsonResponse({
         'status': 'success',
