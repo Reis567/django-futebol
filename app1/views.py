@@ -131,8 +131,6 @@ def remover_registro_gol(partida, gol, tipo_time):
     partida.save() 
 
     return partida.placar_casa, partida.placar_visitante
-
-
 def registrar_gol(request, jogador_id, partida_id, tipo_gol):
     jogador = get_object_or_404(Jogador, id=jogador_id)
     partida = get_object_or_404(Partida, id=partida_id)
@@ -142,19 +140,29 @@ def registrar_gol(request, jogador_id, partida_id, tipo_gol):
     tipo_time = data.get('tipo_time')
     gol_contra = tipo_gol == 'gol_contra'
 
+    if tipo_time == 'casa':
+        gol_tipo = 'CASA'
+    elif tipo_time == 'visitante':
+        gol_tipo = 'VISITANTE'
+    else:
+        gol_tipo = None 
     gol = Gol(
         jogador=jogador,
         partida=partida,
         gol_contra=gol_contra,
-        tempo=tempo_completo
+        tempo=tempo_completo,
+        gol_tipo=gol_tipo
     )
-    print(tipo_time)
+    gol.save()
 
+    # Após registrar o gol, recalcula o placar
+    partida.calcular_placar()
 
+    # Retorna o placar atualizado
     return JsonResponse({
         'status': 'success',
-        'placar_casa': partida_atualizada.placar_casa,
-        'placar_visitante': partida_atualizada.placar_visitante
+        'placar_casa': partida.placar_casa,
+        'placar_visitante': partida.placar_visitante
     })
 
 @require_http_methods(["DELETE"])
