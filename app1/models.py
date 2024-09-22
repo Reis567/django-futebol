@@ -128,3 +128,25 @@ class Gol(models.Model):
     def __str__(self):
         return f'Gol de {self.jogador.nome} aos {self.tempo}'
 
+
+
+class Cartao(models.Model):
+    LADO_CARTAO = [
+        ('CASA', 'Casa'),
+        ('VISITANTE', 'Visitante'),
+    ]
+    TIPO_CARTAO = [
+        ('AMARELO', 'Amarelo'),
+        ('VERMELHO', 'Vermelho'),
+    ]
+
+    tipo_cartao = models.CharField(max_length=15, choices=TIPO_CARTAO, null=True, blank=True)
+    lado_cartao = models.CharField(max_length=15, choices=LADO_CARTAO, null=True, blank=True)
+    jogador = models.ForeignKey(Jogador, on_delete=models.CASCADE, related_name='cartoes_partida')
+    partida = models.ForeignKey(Partida, on_delete=models.CASCADE, related_name='cartoes')
+    tempo = models.CharField(max_length=10, null=True, blank=True)  # Formato: XX:XX/2T
+
+    def __str__(self):
+        return f'{self.tipo_cartao.capitalize()} para {self.jogador.nome} aos {self.tempo}'
+
+
