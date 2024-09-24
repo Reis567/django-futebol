@@ -234,3 +234,31 @@ def adicionar_cartao(request, jogador_id, partida_id):
     cartao.save()
 
     return JsonResponse({'status': 'success', 'message': 'Cartão registrado com sucesso!'})
+
+
+@require_http_methods(["DELETE"])
+def remover_cartao(request, jogador_id, partida_id):
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        cart_tipo = data.get('cart_tipo')
+        cart_lado = data.get('cart_lado')
+        tempo = data.get('tempo')
+
+        # Encontra o cartão com os detalhes especificados
+        cartao = Cartao.objects.filter(
+            jogador_id=jogador_id,
+            partida_id=partida_id,
+            cart_tipo=cart_tipo,
+            cart_lado=cart_lado,
+            tempo=tempo
+        ).order_by('-id').first()
+
+        if not cartao:
+            return JsonResponse({'error': 'Cartão não encontrado'}, status=404)
+
+        cartao.delete()
+
+        return JsonResponse({'status': 'success', 'message': 'Cartão removido com sucesso!'})
+    
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
