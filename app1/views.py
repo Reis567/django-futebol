@@ -209,3 +209,28 @@ def time_detail(request, time_id):
     }
 
     return render(request, 'time/time_detail.html', context)
+
+
+
+@require_http_methods(["POST"])
+def adicionar_cartao(request, jogador_id, partida_id):
+    jogador = get_object_or_404(Jogador, id=jogador_id)
+    partida = get_object_or_404(Partida, id=partida_id)
+
+    # Carrega os dados enviados na requisição (tempo, tipo de cartão, lado)
+    data = json.loads(request.body.decode('utf-8'))
+    cart_tipo = data.get('cart_tipo')
+    cart_lado = data.get('cart_lado')
+    tempo = data.get('tempo')
+
+    # Cria e salva o cartão
+    cartao = Cartao(
+        jogador=jogador,
+        partida=partida,
+        cart_tipo=cart_tipo,
+        cart_lado=cart_lado,
+        tempo=tempo
+    )
+    cartao.save()
+
+    return JsonResponse({'status': 'success', 'message': 'Cartão registrado com sucesso!'})
