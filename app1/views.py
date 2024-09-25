@@ -86,22 +86,41 @@ def transmissao_partida(request, partida_id):
         posicao_ordenada=ordem_posicao
     ).order_by('posicao_ordenada')
 
-    # Buscar os gols da partida
-    gols_casa = Gol.objects.filter(partida=partida, jogador__in=titulares_casa)
-    gols_visitante = Gol.objects.filter(partida=partida, jogador__in=titulares_visitante)
+    # Buscar os gols da partida, incluindo gols contra
+    gols_casa = Gol.objects.filter(partida=partida, gol_tipo='CASA')
+    gols_visitante = Gol.objects.filter(partida=partida, gol_tipo='VISITANTE')
 
-    # Organizar os gols por jogador
+    # Organizar os gols por jogador para o time da casa
     gols_por_jogador_casa = {}
     for gol in gols_casa:
-        if gol.jogador.id not in gols_por_jogador_casa:
-            gols_por_jogador_casa[gol.jogador.id] = []
-        gols_por_jogador_casa[gol.jogador.id].append(gol)
+        jogador_id = gol.jogador.id
+        if jogador_id not in gols_por_jogador_casa:
+            gols_por_jogador_casa[jogador_id] = []
+        gols_por_jogador_casa[jogador_id].append(gol)
 
+    # Organizar os gols por jogador para o time visitante
     gols_por_jogador_visitante = {}
     for gol in gols_visitante:
-        if gol.jogador.id not in gols_por_jogador_visitante:
-            gols_por_jogador_visitante[gol.jogador.id] = []
-        gols_por_jogador_visitante[gol.jogador.id].append(gol)
+        jogador_id = gol.jogador.id
+        if jogador_id not in gols_por_jogador_visitante:
+            gols_por_jogador_visitante[jogador_id] = []
+        gols_por_jogador_visitante[jogador_id].append(gol)
+
+    # Gols contra: associar os gols contra ao time adversário
+    gols_contra_casa = Gol.objects.filter(partida=partida, gol_contra=True, gol_tipo='CASA')
+    gols_contra_visitante = Gol.objects.filter(partida=partida, gol_contra=True, gol_tipo='VISITANTE')
+
+    for gol in gols_contra_casa:
+        jogador_id = gol.jogador.id
+        if jogador_id not in gols_por_jogador_casa:
+            gols_por_jogador_casa[jogador_id] = []
+        gols_por_jogador_casa[jogador_id].append(gol)
+
+    for gol in gols_contra_visitante:
+        jogador_id = gol.jogador.id
+        if jogador_id not in gols_por_jogador_visitante:
+            gols_por_jogador_visitante[jogador_id] = []
+        gols_por_jogador_visitante[jogador_id].append(gol)
 
     context = {
         'partida': partida,
