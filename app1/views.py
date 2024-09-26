@@ -104,6 +104,23 @@ def transmissao_partida(request, partida_id):
     gols_contra_casa = Gol.objects.filter(partida=partida, gol_contra=True, gol_tipo='CASA')
     gols_contra_visitante = Gol.objects.filter(partida=partida, gol_contra=True, gol_tipo='VISITANTE')
 
+    # Adicionar os gols contra ao jogador que os cometeu
+    for gol in gols_contra_casa:
+        for jogador in titulares_casa:  # Gols contra são atribuídos ao jogador do time da casa que cometeu
+            if jogador.id == gol.jogador.id:
+                if not hasattr(jogador, 'gols'):
+                    jogador.gols = []
+                    
+                # Verifica se o gol já foi adicionado
+                if not any(g['tempo'] == gol.tempo and g['gol_contra'] for g in jogador.gols):
+                    jogador.gols.append({
+                        'tempo': gol.tempo,
+                        'gol_contra': True
+                    })
+
+                print(jogador.gols)  # Para verificar se os gols estão sendo adicionados corretamente
+
+
     for gol in gols_contra_visitante:
         print(gol)
         for jogador in titulares_visitante:  # Gols contra são atribuídos ao jogador do time visitante que cometeu
@@ -119,24 +136,6 @@ def transmissao_partida(request, partida_id):
                     })
 
                 print(jogador.gols)
-
-
-    for gol in gols_contra_visitante:
-        print(gol)
-        for jogador in titulares_visitante:  # Gols contra são atribuídos ao jogador do time visitante que cometeu
-            if jogador.id == gol.jogador.id:
-                if not hasattr(jogador, 'gols'):
-                    jogador.gols = []
-
-                # Verifica se o gol já foi adicionado
-                if not any(g['tempo'] == gol.tempo and g['gol_contra'] for g in jogador.gols):
-                    jogador.gols.append({
-                        'tempo': gol.tempo,
-                        'gol_contra': True
-                    })
-
-                print(jogador.gols)
-
 
     context = {
         'partida': partida,
