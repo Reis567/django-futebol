@@ -5,40 +5,66 @@
 <div class="transmissao-container">
 
 
+<!-- Primeira coluna: Time da Casa -->
+<div class="time time-casa">
+    <h2 class="time-nome">{{ partida.time_casa.nome }}</h2>
+    <div class="jogadores">
+        <!-- Jogadores titulares do time da casa -->
+        {% for jogador in titulares_casa %}
+            <div class="jogador" data-jogador-id="{{ jogador.id }}" data-time="casa">
+                <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
+                <div class="nome-jogador">{{ jogador.nome }}</div>
 
+                <!-- Exibir gols do jogador -->
+                <div class="gols-jogador">
+                    {% for gol in jogador.gols %}
+                        {% if gol.gol_contra %}
+                        
+                            <span class="icone-gol-contra">❌</span>
+                        {% else %}
+                            <!-- Exibe ícone de gol -->
+                            <span class="icone-gol">⚽</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
 
-    <!-- Primeira coluna: Time da Casa -->
-    <div class="time time-casa">
-        <h2 class="time-nome">{{ partida.time_casa.nome }}</h2>
+                <div class="drop-area"></div> <!-- Área para eventos futuros -->
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Informações do técnico e banco de reservas -->
+    <div class="tecnico">Técnico: {{ partida.time_casa.tecnico }}</div>
+    <div class="banco">
+        <h3>Banco de Reservas</h3>
         <div class="jogadores">
-            {% for jogador in titulares_casa %}
+            <!-- Jogadores reservas do time da casa -->
+            {% for jogador in banco_casa %}
                 <div class="jogador" data-jogador-id="{{ jogador.id }}" data-time="casa">
-
                     <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                     <div class="nome-jogador">{{ jogador.nome }}</div>
+
+                    <!-- Exibir gols do jogador -->
+                    <div class="gols-jogador">
+                        {% for gol in jogador.gols %}
+                            {% if gol.gol_contra %}
+                                <!-- Exibe ícone de gol contra -->
+                                <span class="icone-gol-contra">❌</span>
+                            {% else %}
+                                <!-- Exibe ícone de gol -->
+                                <span class="icone-gol">⚽</span>
+                            {% endif %}
+
+                        {% endfor %}
+                    </div>
+
                     <div class="drop-area"></div>
                 </div>
             {% endfor %}
         </div>
-        <div class="tecnico">Técnico: {{ partida.time_casa.tecnico }}</div>
-        <div class="banco">
-            <h3>Banco de Reservas</h3>
-            <div class="jogadores">
-                {% for jogador in banco_casa %}
-                    <div class="jogador" data-jogador-id="{{ jogador.id }}" data-time="casa">
-
-                        <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
-                        <div class="nome-jogador">{{ jogador.nome }}</div>
-                        <div class="drop-area"></div> <!-- Área para receber o ícone de substituição -->
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
     </div>
+</div>
 
-    
-    
-    
 
     <!-- Coluna Central -->
     <div class="central">
@@ -118,36 +144,62 @@
 
 
 
+<!-- Coluna do Time Visitante -->
+<div class="time time-visitante">
+    <h2 class="time-nome">{{ partida.time_visitante.nome }}</h2>
+    <div class="jogadores">
+        {% for jogador in titulares_visitante %}
+            <div class="jogador" data-jogador-id="{{ jogador.id }}" data-time="visitante">
+                <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
+                <div class="nome-jogador">{{ jogador.nome }}</div>
 
-    <!-- Coluna do Time Visitante -->
-    <div class="time time-visitante">
-        <h2 class="time-nome">{{ partida.time_visitante.nome }}</h2>
+                    <!-- Exibir gols do jogador -->
+                    <div class="gols-jogador">
+                        {% for gol in jogador.gols %}
+                            {% if gol.gol_contra %}
+                                <span class="icone-gol-contra">❌</span>
+                            {% else %}
+                                <span class="icone-gol">⚽</span>
+                            {% endif %}
+                            <span class="tempo-gol">{{ gol.tempo }}</span>
+                        {% endfor %}
+                    
+                    </div>
+
+
+                <div class="drop-area"></div> <!-- Área para eventos futuros -->
+            </div>
+        {% endfor %}
+    </div>
+    <div class="tecnico">Técnico: {{ partida.time_visitante.tecnico }}</div>
+    <div class="banco">
+        <h3>Banco de Reservas</h3>
         <div class="jogadores">
-            {% for jogador in titulares_visitante %}
+            {% for jogador in banco_visitante %}
                 <div class="jogador" data-jogador-id="{{ jogador.id }}" data-time="visitante">
                     <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                     <div class="nome-jogador">{{ jogador.nome }}</div>
-                    <div class="drop-area"></div> <!-- Área para receber o ícone de substituição -->
+
+                    <!-- Exibir gols do jogador -->
+                    <div class="gols-jogador">
+                        {% for gol in jogador.gols %}
+                            {% if gol.gol_contra %}
+                                <span class="icone-gol-contra">❌</span>
+                            {% else %}
+                                <span class="icone-gol">⚽</span>
+                            {% endif %}
+                            <span class="tempo-gol">{{ gol.tempo }}</span>
+                        {% endfor %}
+                    
+                    </div>
+
+
+                    <div class="drop-area"></div>
                 </div>
             {% endfor %}
         </div>
-        <div class="tecnico">Técnico: {{ partida.time_visitante.tecnico }}</div>
-        <div class="banco">
-            <h3>Banco de Reservas</h3>
-            <div class="jogadores">
-                {% for jogador in banco_visitante %}
-                    <div class="jogador" data-jogador-id="{{ jogador.id }}" data-time="visitante">
-
-                        <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
-                        <div class="nome-jogador">{{ jogador.nome }}</div>
-                        <div class="drop-area"></div> <!-- Área para receber o ícone de substituição -->
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
     </div>
-
-
+</div>
 
 
 </div>

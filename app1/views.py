@@ -56,7 +56,6 @@ def selecionar_partida(request):
     return render(request, 'transmissao/selecionar_partida.html', {'times': times, 'competicoes': competicoes})
 
 
-
 def transmissao_partida(request, partida_id):
     partida = get_object_or_404(Partida, id=partida_id)
 
@@ -69,58 +68,75 @@ def transmissao_partida(request, partida_id):
         output_field=IntegerField()
     )
 
-    # Ordenar jogadores por posição para titulares e banco do time da casa
-    titulares_casa = partida.time_casa.jogadores_titulares.annotate(
-        posicao_ordenada=ordem_posicao
-    ).order_by('posicao_ordenada')
-    
-    banco_casa = partida.time_casa.jogadores_banco.annotate(
-        posicao_ordenada=ordem_posicao
-    ).order_by('posicao_ordenada')
+    # Ordenar jogadores por posição para titulares e banco do time da casa e visitante
+    titulares_casa = partida.time_casa.jogadores_titulares.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada')
+    banco_casa = partida.time_casa.jogadores_banco.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada')
+    titulares_visitante = partida.time_visitante.jogadores_titulares.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada')
+    banco_visitante = partida.time_visitante.jogadores_banco.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada')
 
-    titulares_visitante = partida.time_visitante.jogadores_titulares.annotate(
-        posicao_ordenada=ordem_posicao
-    ).order_by('posicao_ordenada')
-    
-    banco_visitante = partida.time_visitante.jogadores_banco.annotate(
-        posicao_ordenada=ordem_posicao
-    ).order_by('posicao_ordenada')
-
-    # Buscar os gols da partida, incluindo gols contra
+    # Filtrar gols do time da casa e visitante
     gols_casa = Gol.objects.filter(partida=partida, gol_tipo='CASA')
     gols_visitante = Gol.objects.filter(partida=partida, gol_tipo='VISITANTE')
 
-    # Organizar os gols por jogador para o time da casa
-    gols_por_jogador_casa = {}
+    # Adicionar gols aos jogadores do time da casa
     for gol in gols_casa:
-        jogador_id = gol.jogador.id
-        if jogador_id not in gols_por_jogador_casa:
-            gols_por_jogador_casa[jogador_id] = []
-        gols_por_jogador_casa[jogador_id].append(gol)
+        for jogador in titulares_casa:
+            if jogador.id == gol.jogador.id:  # Verifique se é o jogador correto
+                if not hasattr(jogador, 'gols'):
+                    jogador.gols = []  # Criar o atributo se não existir
+                jogador.gols.append({
+                    'tempo': gol.tempo,
+                    'gol_contra': gol.gol_contra
+                })
 
-    # Organizar os gols por jogador para o time visitante
-    gols_por_jogador_visitante = {}
+    # Adicionar gols aos jogadores do time visitante
     for gol in gols_visitante:
-        jogador_id = gol.jogador.id
-        if jogador_id not in gols_por_jogador_visitante:
-            gols_por_jogador_visitante[jogador_id] = []
-        gols_por_jogador_visitante[jogador_id].append(gol)
+        for jogador in titulares_visitante:
+            if jogador.id == gol.jogador.id:  # Verifique se é o jogador correto
+                if not hasattr(jogador, 'gols'):
+                    jogador.gols = []  # Criar o atributo se não existir
+                jogador.gols.append({
+                    'tempo': gol.tempo,
+                    'gol_contra': gol.gol_contra
+                })
 
-    # Gols contra: associar os gols contra ao time adversário
+    # Gols contra: associar os gols contra ao jogador que cometeu o gol contra
     gols_contra_casa = Gol.objects.filter(partida=partida, gol_contra=True, gol_tipo='CASA')
     gols_contra_visitante = Gol.objects.filter(partida=partida, gol_contra=True, gol_tipo='VISITANTE')
 
-    for gol in gols_contra_casa:
-        jogador_id = gol.jogador.id
-        if jogador_id not in gols_por_jogador_casa:
-            gols_por_jogador_casa[jogador_id] = []
-        gols_por_jogador_casa[jogador_id].append(gol)
+    for gol in gols_contra_visitante:
+        print(gol)
+        for jogador in titulares_visitante:  # Gols contra são atribuídos ao jogador do time visitante que cometeu
+            if jogador.id == gol.jogador.id:
+                if not hasattr(jogador, 'gols'):
+                    jogador.gols = []
+
+                # Verifica se o gol já foi adicionado
+                if not any(g['tempo'] == gol.tempo and g['gol_contra'] for g in jogador.gols):
+                    jogador.gols.append({
+                        'tempo': gol.tempo,
+                        'gol_contra': True
+                    })
+
+                print(jogador.gols)
+
 
     for gol in gols_contra_visitante:
-        jogador_id = gol.jogador.id
-        if jogador_id not in gols_por_jogador_visitante:
-            gols_por_jogador_visitante[jogador_id] = []
-        gols_por_jogador_visitante[jogador_id].append(gol)
+        print(gol)
+        for jogador in titulares_visitante:  # Gols contra são atribuídos ao jogador do time visitante que cometeu
+            if jogador.id == gol.jogador.id:
+                if not hasattr(jogador, 'gols'):
+                    jogador.gols = []
+
+                # Verifica se o gol já foi adicionado
+                if not any(g['tempo'] == gol.tempo and g['gol_contra'] for g in jogador.gols):
+                    jogador.gols.append({
+                        'tempo': gol.tempo,
+                        'gol_contra': True
+                    })
+
+                print(jogador.gols)
+
 
     context = {
         'partida': partida,
@@ -128,8 +144,6 @@ def transmissao_partida(request, partida_id):
         'banco_casa': banco_casa,
         'titulares_visitante': titulares_visitante,
         'banco_visitante': banco_visitante,
-        'gols_por_jogador_casa': gols_por_jogador_casa,
-        'gols_por_jogador_visitante': gols_por_jogador_visitante,
     }
 
     return render(request, 'transmissao/transmissao_partida.html', context)
