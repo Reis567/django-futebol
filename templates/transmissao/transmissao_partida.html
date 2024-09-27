@@ -311,6 +311,108 @@
 
 
 
+<script>
+    const icones = document.querySelectorAll('.icone-acao');
+    const jogadores = document.querySelectorAll('.jogador');
+
+    // Adicionar eventos de dragstart nos ícones
+    icones.forEach(icone => {
+        const tipoIcone = icone.id; // Verifica o id do ícone
+
+        // Aplicar lógica de arrastar apenas para ícones de cartão e substituição
+        if (tipoIcone === 'cartao-amarelo' || tipoIcone === 'cartao-vermelho') {
+            icone.addEventListener('dragstart', function (e) {
+                const tipoCartao = this.getAttribute('data-tipo-gol'); // Ex: 'cartao_amarelo', 'cartao_vermelho'
+                e.dataTransfer.setData('text/plain', tipoCartao); // Passa o tipo do cartão
+            });
+        }
+    });
+
+    jogadores.forEach(jogador => {
+        const dropArea = jogador.querySelector('.drop-area');
+
+        // Permitir o drop
+        dropArea.addEventListener('dragover', function (e) {
+            e.preventDefault(); // Necessário para permitir o drop
+        });
+
+        // Lidar com o drop
+        dropArea.addEventListener('drop', function (e) {
+            e.preventDefault();
+            const tipoCartao = e.dataTransfer.getData('text/plain'); // Pega o tipo de cartão arrastado
+            if (!tipoCartao) {
+                console.error('Tipo de cartão indefinido!');
+                return;
+            }
+
+            const jogadorId = jogador.getAttribute('data-jogador-id');
+            const partidaId = {{ partida.id }};
+            const tempoAtual = document.getElementById('cronometro').textContent; // Captura o tempo do cronômetro
+            const periodoAtual = document.getElementById('periodo').textContent; // Captura o período (1T, 2T, etc.)
+            const nomeJogador = jogador.querySelector('.nome-jogador');
+
+            // Criar o elemento visual do cartão
+            const novoIcone = document.createElement('span');
+            novoIcone.classList.add('icone-cartao');
+            novoIcone.textContent = tipoCartao === 'cartao_amarelo' ? '🟨' : '🟥'; // Define o ícone
+            novoIcone.dataset.tipoCartao = tipoCartao; // Armazena o tipo do cartão
+
+            // Adicionar evento para remover o cartão ao clicar
+            novoIcone.addEventListener('click', function() {
+                nomeJogador.removeChild(novoIcone); // Remove o ícone visual
+
+                // Realizar o fetch para deletar o cartão do banco de dados
+                fetch(`/remover_cartao/${jogadorId}/${partidaId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        cart_tipo: tipoCartao,
+                        tempo: `${tempoAtual}/${periodoAtual}`
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Cartão removido com sucesso:', data);
+                })
+                .catch(error => {
+                    console.error('Erro ao remover o cartão:', error);
+                });
+            });
+
+            // Adicionar o ícone de cartão ao jogador
+            nomeJogador.appendChild(novoIcone);
+
+            // Realizar o fetch para registrar o cartão no banco de dados
+            fetch(`/adicionar_cartao/${jogadorId}/${partidaId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    cart_tipo: tipoCartao,
+                    tempo: `${tempoAtual}/${periodoAtual}`
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Cartão registrado com sucesso:', data);
+            })
+            .catch(error => {
+                console.error('Erro ao registrar o cartão:', error);
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
 
 <!--GOL E GOL CONTRA-->
 <script>
