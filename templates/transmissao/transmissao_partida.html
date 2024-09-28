@@ -310,7 +310,7 @@
 
 
 
-
+<!--  CARTOES -->
 <script>
     const icones = document.querySelectorAll('.icone-acao');
     const jogadores = document.querySelectorAll('.jogador');
@@ -322,7 +322,7 @@
         // Aplicar lógica de arrastar apenas para ícones de cartão e substituição
         if (tipoIcone === 'cartao-amarelo' || tipoIcone === 'cartao-vermelho') {
             icone.addEventListener('dragstart', function (e) {
-                const tipoCartao = this.getAttribute('data-tipo-gol'); // Ex: 'cartao_amarelo', 'cartao_vermelho'
+                const tipoCartao = this.getAttribute('data-tipo-cartao'); // Ex: 'cartao_amarelo', 'cartao_vermelho'
                 e.dataTransfer.setData('text/plain', tipoCartao); // Passa o tipo do cartão
             });
         }
@@ -346,6 +346,8 @@
             }
 
             const jogadorId = jogador.getAttribute('data-jogador-id');
+            const tipoTime = jogador.getAttribute('data-time'); // Pegando o tipoTime
+            console.log(tipoTime); // Verifica o time do jogador
             const partidaId = {{ partida.id }};
             const tempoAtual = document.getElementById('cronometro').textContent; // Captura o tempo do cronômetro
             const periodoAtual = document.getElementById('periodo').textContent; // Captura o período (1T, 2T, etc.)
@@ -362,7 +364,7 @@
                 nomeJogador.removeChild(novoIcone); // Remove o ícone visual
 
                 // Realizar o fetch para deletar o cartão do banco de dados
-                fetch(`/remover_cartao/${jogadorId}/${partidaId}/`, {
+                fetch(`/partida/${partidaId}/jogador/${jogadorId}/remover_cartao/`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -370,6 +372,7 @@
                     },
                     body: JSON.stringify({
                         cart_tipo: tipoCartao,
+                        cart_lado: tipoTime, // Enviando o time do jogador
                         tempo: `${tempoAtual}/${periodoAtual}`
                     })
                 })
@@ -386,7 +389,7 @@
             nomeJogador.appendChild(novoIcone);
 
             // Realizar o fetch para registrar o cartão no banco de dados
-            fetch(`/adicionar_cartao/${jogadorId}/${partidaId}/`, {
+            fetch(`/partida/${partidaId}/jogador/${jogadorId}/adicionar_cartao/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -394,6 +397,7 @@
                 },
                 body: JSON.stringify({
                     cart_tipo: tipoCartao,
+                    cart_lado: tipoTime, // Enviando o time do jogador
                     tempo: `${tempoAtual}/${periodoAtual}`
                 })
             })
@@ -407,7 +411,6 @@
         });
     });
 </script>
-
 
 
 
