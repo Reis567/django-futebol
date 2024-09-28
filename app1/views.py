@@ -235,21 +235,26 @@ def adicionar_cartao(request, jogador_id, partida_id):
 
     # Carrega os dados enviados na requisição (tempo, tipo de cartão, lado)
     data = json.loads(request.body.decode('utf-8'))
-    cart_tipo = data.get('cart_tipo')
-    cart_lado = data.get('cart_lado')
-    tempo = data.get('tempo')
+    cart_tipo = data.get('cart_tipo')  # Tipo do cartão (amarelo/vermelho)
+    cart_lado = data.get('cart_lado')  # Lado (casa/visitante)
+    tempo = data.get('tempo')  # Tempo do jogo e período
+
+    # Verifica se os campos obrigatórios foram passados
+    if not cart_tipo or not cart_lado or not tempo:
+        return JsonResponse({'error': 'Dados incompletos'}, status=400)
 
     # Cria e salva o cartão
     cartao = Cartao(
         jogador=jogador,
         partida=partida,
-        cart_tipo=cart_tipo,
-        cart_lado=cart_lado,
+        tipo_cartao=cart_tipo,
+        lado_cartao=cart_lado,
         tempo=tempo
     )
     cartao.save()
 
     return JsonResponse({'status': 'success', 'message': 'Cartão registrado com sucesso!'})
+
 
 
 @require_http_methods(["DELETE"])
