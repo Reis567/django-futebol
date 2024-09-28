@@ -257,6 +257,7 @@ def adicionar_cartao(request, jogador_id, partida_id):
 
 
 
+
 @require_http_methods(["DELETE"])
 def remover_cartao(request, jogador_id, partida_id):
     try:
@@ -265,18 +266,23 @@ def remover_cartao(request, jogador_id, partida_id):
         cart_lado = data.get('cart_lado')
         tempo = data.get('tempo')
 
+        # Obtenha o jogador e a partida com base nos IDs fornecidos
+        jogador = get_object_or_404(Jogador, id=jogador_id)
+        partida = get_object_or_404(Partida, id=partida_id)
+
         # Encontra o cartão com os detalhes especificados
         cartao = Cartao.objects.filter(
-            jogador_id=jogador_id,
-            partida_id=partida_id,
-            cart_tipo=cart_tipo,
-            cart_lado=cart_lado,
+            jogador=jogador,
+            partida=partida,
+            tipo_cartao=cart_tipo,
+            lado_cartao=cart_lado,
             tempo=tempo
         ).order_by('-id').first()
 
         if not cartao:
             return JsonResponse({'error': 'Cartão não encontrado'}, status=404)
 
+        # Remover o cartão encontrado
         cartao.delete()
 
         return JsonResponse({'status': 'success', 'message': 'Cartão removido com sucesso!'})
