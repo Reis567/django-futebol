@@ -309,21 +309,24 @@
 </script>
 
 
-
 <!--  CARTOES -->
 <script>
-    const icones = document.querySelectorAll('.icone-acao');
+    const iconesCartao = document.querySelectorAll('.icone-acao');
     const jogadores = document.querySelectorAll('.jogador');
 
-    // Adicionar eventos de dragstart nos ícones
-    icones.forEach(icone => {
-        const tipoIcone = icone.id; // Verifica o id do ícone
-
-        // Aplicar lógica de arrastar apenas para ícones de cartão e substituição
-        if (tipoIcone === 'cartao-amarelo' || tipoIcone === 'cartao-vermelho') {
+    iconesCartao.forEach(icone => {
+        const tipoCartao = icone.getAttribute('data-tipo-cartao');
+        
+        if (tipoCartao) {
             icone.addEventListener('dragstart', function (e) {
-                const tipoCartao = this.getAttribute('data-tipo-cartao'); // Ex: 'cartao_amarelo', 'cartao_vermelho'
-                e.dataTransfer.setData('text/plain', tipoCartao); // Passa o tipo do cartão
+                console.log(`Drag iniciado com o tipo de cartão: ${tipoCartao}`);
+                e.dataTransfer.setData('cartao', tipoCartao);
+            });
+        } else {
+            const tipoGol = icone.getAttribute('data-tipo-gol');
+            icone.addEventListener('dragstart', function (e) {
+                console.log(`Drag iniciado com o tipo de gol: ${tipoGol}`);
+                e.dataTransfer.setData('gol', tipoGol); 
             });
         }
     });
@@ -331,106 +334,89 @@
     jogadores.forEach(jogador => {
         const dropArea = jogador.querySelector('.drop-area');
 
-        // Permitir o drop
         dropArea.addEventListener('dragover', function (e) {
-            e.preventDefault(); // Necessário para permitir o drop
+            e.preventDefault();
+
         });
 
-        // Lidar com o drop
         dropArea.addEventListener('drop', function (e) {
             e.preventDefault();
-            const tipoCartao = e.dataTransfer.getData('text/plain'); // Pega o tipo de cartão arrastado
-            if (!tipoCartao) {
-                console.error('Tipo de cartão indefinido!');
-                return;
-            }
+            const tipoCartao = e.dataTransfer.getData('cartao');
 
-            const jogadorId = jogador.getAttribute('data-jogador-id');
-            const tipoTime = jogador.getAttribute('data-time'); // Pegando o tipoTime
-            console.log(tipoTime); // Verifica o time do jogador
-            const partidaId = {{ partida.id }};
-            const tempoAtual = document.getElementById('cronometro').textContent; // Captura o tempo do cronômetro
-            const periodoAtual = document.getElementById('periodo').textContent; // Captura o período (1T, 2T, etc.)
-            const nomeJogador = jogador.querySelector('.nome-jogador');
+            if (tipoCartao) {
+                console.log(`Item dropado com tipo de cartão: ${tipoCartao}`);
+                const jogadorId = jogador.getAttribute('data-jogador-id');
+                const tipoTime = jogador.getAttribute('data-time');
+                const partidaId = {{ partida.id }};
+                const tempoAtual = document.getElementById('cronometro').textContent;
+                const periodoAtual = document.getElementById('periodo').textContent;
+                const nomeJogador = jogador.querySelector('.nome-jogador');
 
-            // Criar o elemento visual do cartão
-            const novoIcone = document.createElement('span');
-            novoIcone.classList.add('icone-cartao');
-            novoIcone.textContent = tipoCartao === 'cartao_amarelo' ? '🟨' : '🟥'; // Define o ícone
-            novoIcone.dataset.tipoCartao = tipoCartao; // Armazena o tipo do cartão
+                const novoIcone = document.createElement('span');
+                novoIcone.classList.add('icone-cartao');
+                novoIcone.textContent = tipoCartao === 'cartao_amarelo' ? '🟨' : '🟥';
+                novoIcone.dataset.tipoCartao = tipoCartao;
 
-            // Adicionar evento para remover o cartão ao clicar
-            novoIcone.addEventListener('click', function() {
-                nomeJogador.removeChild(novoIcone); // Remove o ícone visual
 
-                // Realizar o fetch para deletar o cartão do banco de dados
-                fetch(`/partida/${partidaId}/jogador/${jogadorId}/remover_cartao/`, {
-                    method: 'DELETE',
+                // Remover cartão ao clicar
+                novoIcone.addEventListener('click', function () {
+                    nomeJogador.removeChild(novoIcone);
+                    console.log('Cartão removido da interface');
+
+                    fetch(`/partida/${partidaId}/jogador/${jogadorId}/remover_cartao/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({
+                            cart_tipo: tipoCartao,
+                            cart_lado: tipoTime,
+                            tempo: `${tempoAtual}/${periodoAtual}`
+                        })
+                    }).then(response => response.json())
+                    .then(data => console.log('Cartão removido com sucesso do backend:', data))
+                    .catch(error => console.error('Erro ao remover o cartão no backend:', error));
+                });
+
+                nomeJogador.appendChild(novoIcone);
+                console.log('Novo ícone de cartão adicionado à interface');
+
+                // Registrar o cartão no backend
+                fetch(`/partida/${partidaId}/jogador/${jogadorId}/adicionar_cartao/`, {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': '{{ csrf_token }}'
                     },
                     body: JSON.stringify({
                         cart_tipo: tipoCartao,
-                        cart_lado: tipoTime, // Enviando o time do jogador
+                        cart_lado: tipoTime,
                         tempo: `${tempoAtual}/${periodoAtual}`
                     })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Cartão removido com sucesso:', data);
-                })
-                .catch(error => {
-                    console.error('Erro ao remover o cartão:', error);
-                });
-            });
-
-            // Adicionar o ícone de cartão ao jogador
-            nomeJogador.appendChild(novoIcone);
-
-            // Realizar o fetch para registrar o cartão no banco de dados
-            fetch(`/partida/${partidaId}/jogador/${jogadorId}/adicionar_cartao/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({
-                    cart_tipo: tipoCartao,
-                    cart_lado: tipoTime, // Enviando o time do jogador
-                    tempo: `${tempoAtual}/${periodoAtual}`
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Cartão registrado com sucesso:', data);
-            })
-            .catch(error => {
-                console.error('Erro ao registrar o cartão:', error);
-            });
+                }).then(response => response.json())
+                .then(data => console.log('Cartão registrado com sucesso no backend:', data))
+                .catch(error => console.error('Erro ao registrar o cartão no backend:', error));
+            } else {
+                console.log('Nenhum cartão foi dropado');
+            }
         });
     });
+
 </script>
 
-
-
-
-
-
-<!--GOL E GOL CONTRA-->
+<!-- GOL E GOL CONTRA -->
 <script>
-    const icones = document.querySelectorAll('.icone-acao');
-    const jogadores = document.querySelectorAll('.jogador');
 
-    // Adicionar os eventos de dragstart nos ícones
-    icones.forEach(icone => {
-        const tipoIcone = icone.id; // Verifica o id do ícone (bola, gol-contra, etc.)
+    const iconesGol = document.querySelectorAll('.icone-acao');
 
-        // Só aplicar a lógica de arrastar para ícones de gol e gol contra
+    iconesGol.forEach(icone => {
+        const tipoIcone = icone.id;
+
         if (tipoIcone === 'bola' || tipoIcone === 'gol-contra') {
             icone.addEventListener('dragstart', function (e) {
-                const tipoGol = this.getAttribute('data-tipo-gol'); // Obtém o tipo de gol
-                e.dataTransfer.setData('text/plain', tipoGol); // Passa o tipo do gol (ex: gol, gol_contra)
+                const tipoGol = this.getAttribute('data-tipo-gol');
+                e.dataTransfer.setData('gol', tipoGol);
             });
         }
     });
@@ -438,146 +424,76 @@
     jogadores.forEach(jogador => {
         const dropArea = jogador.querySelector('.drop-area');
 
-        // Permitir o drop
         dropArea.addEventListener('dragover', function (e) {
-            e.preventDefault(); // Necessário para permitir o drop
+            e.preventDefault();
         });
 
-        // Lidar com o drop
         dropArea.addEventListener('drop', function (e) {
             e.preventDefault();
-            const tipoGol = e.dataTransfer.getData('text/plain'); // Pega o tipo do gol arrastado
-            if (!tipoGol) {
-                console.error('Tipo de gol indefinido!');
-                return;
-            }
+            const tipoGol = e.dataTransfer.getData('gol');
 
-            const jogadorId = jogador.getAttribute('data-jogador-id');
-            const tipoTime = jogador.getAttribute('data-time');
-            console.log(tipoTime)
-            const partidaId = {{ partida.id }};
+            if (tipoGol) {
+                const jogadorId = jogador.getAttribute('data-jogador-id');
+                const tipoTime = jogador.getAttribute('data-time');
+                const partidaId = {{ partida.id }};
+                const tempoAtual = document.getElementById('cronometro').textContent;
+                const periodoAtual = document.getElementById('periodo').textContent;
+                const nomeJogador = jogador.querySelector('.nome-jogador');
 
-            const nomeJogador = jogador.querySelector('.nome-jogador');
+                const novoIcone = document.createElement('span');
+                novoIcone.classList.add('icone-substituicao');
+                novoIcone.textContent = tipoGol === 'gol' ? '⚽' : '❌';
+                novoIcone.dataset.tipoGol = tipoGol;
 
-            // Capturar o tempo atual do cronômetro e o período
-            const tempoAtual = document.getElementById('cronometro').textContent; // Captura o tempo do cronômetro
-            console.log(tempoAtual)
-            const periodoAtual = document.getElementById('periodo').textContent; // Captura o período (1T, 2T, etc.)
-            console.log(periodoAtual)
-            // Criar um elemento de ícone para ser adicionado ao jogador
-            const novoIcone = document.createElement('span');
-            novoIcone.classList.add('icone-substituicao');
-            novoIcone.textContent = tipoGol === 'gol' ? '⚽' : '❌'; // Define o ícone
-            novoIcone.dataset.tipoGol = tipoGol; // Armazena o tipo de gol no ícone
+                novoIcone.addEventListener('click', function () {
+                    nomeJogador.removeChild(novoIcone);
+                    fetch(`/remover_gol/${jogadorId}/${partidaId}/${tipoGol}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({
+                            tipo_time: tipoTime
+                        })
+                    }).then(response => response.json())
+                    .then(data => {
+                        console.log('Gol removido com sucesso:', data);
+                        document.querySelector('.placar-casa').textContent = data.placar_casa;
+                        document.querySelector('.placar-visitante').textContent = data.placar_visitante;
+                    })
+                    .catch(error => console.error('Erro ao remover o gol:', error));
+                });
 
-            // Adicionar evento para remover o ícone ao clicar
-            novoIcone.addEventListener('click', function() {
-                // Remover o ícone da interface
-                nomeJogador.removeChild(novoIcone);
+                nomeJogador.appendChild(novoIcone);
 
-                // Realizar o fetch para deletar o gol no banco de dados
-                fetch(`/remover_gol/${jogadorId}/${partidaId}/${tipoGol}/`, {
-                    method: 'DELETE',
+                fetch(`/registrar_gol/${jogadorId}/${partidaId}/${tipoGol}/`, {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'  // Necessário para requisições DELETE no Django
+                        'X-CSRFToken': '{{ csrf_token }}'
                     },
                     body: JSON.stringify({
-                        tipo_time: tipoTime  // Passa o tipo do time ("casa" ou "visitante")
+                        tempo: `${tempoAtual}/${periodoAtual}`,
+                        tipo_time: tipoTime
                     })
-                })
-                .then(response => response.json())
+                }).then(response => response.json())
                 .then(data => {
-                    console.log('Gol removido com sucesso:', data);
-                    // Atualize o placar exibido na página, se necessário
+                    console.log('Gol registrado com sucesso:', data);
                     document.querySelector('.placar-casa').textContent = data.placar_casa;
                     document.querySelector('.placar-visitante').textContent = data.placar_visitante;
                 })
-                .catch(error => {
-                    console.error('Erro ao remover o gol:', error);
-                });
-            });
-
-            // Adiciona o ícone ao lado direito do nome do jogador
-            nomeJogador.appendChild(novoIcone);
-
-            // Realizar o fetch para registrar o gol
-            fetch(`/registrar_gol/${jogadorId}/${partidaId}/${tipoGol}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}' 
-                },
-                body: JSON.stringify({
-                    tempo: `${tempoAtual}/${periodoAtual}`,
-                    tipo_time: tipoTime 
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Gol registrado com sucesso:', data);
-                // Atualize o placar exibido na página, se necessário
-                document.querySelector('.placar-casa').textContent = data.placar_casa;
-                document.querySelector('.placar-visitante').textContent = data.placar_visitante;
-            })
-            .catch(error => {
-                console.error('Erro ao registrar o gol:', error);
-            });
+                .catch(error => console.error('Erro ao registrar o gol:', error));
+            }
         });
     });
+
 </script>
 
 
 
 
 
-
-
-<!--ACOES -->
-<script>
-    // Funções de drag-and-drop
-    const icones = document.querySelectorAll('.icone-acao');
-    const jogadores = document.querySelectorAll('.jogador');
-
-    // Adicionar os eventos de dragstart nos ícones
-    icones.forEach(icone => {
-        icone.addEventListener('dragstart', function (e) {
-            e.dataTransfer.setData('text/plain', this.innerHTML); // Passa o conteúdo do ícone (ex: ⚽, 🟨, etc)
-        });
-    });
-
-    jogadores.forEach(jogador => {
-        const dropArea = jogador.querySelector('.drop-area');
-
-        // Permitir o drop
-        dropArea.addEventListener('dragover', function (e) {
-            e.preventDefault(); // Necessário para permitir o drop
-        });
-
-        // Lidar com o drop
-        dropArea.addEventListener('drop', function (e) {
-            e.preventDefault();
-            const iconeHtml = e.dataTransfer.getData('text/plain'); // Pega o ícone que foi arrastado
-            const nomeJogador = jogador.querySelector('.nome-jogador');
-
-            // Criar um elemento de ícone para ser adicionado ao jogador
-            const novoIcone = document.createElement('span');
-            novoIcone.classList.add('icone-substituicao');
-            novoIcone.innerHTML = iconeHtml; // Define o ícone
-
-            // Adicionar evento para remover o ícone ao clicar
-            novoIcone.addEventListener('click', function() {
-                nomeJogador.removeChild(novoIcone); // Remove o ícone ao ser clicado
-            });
-
-            // Adiciona o ícone ao lado direito do nome do jogador
-            nomeJogador.appendChild(novoIcone); 
-        });
-    });
-
-
-
-</script>
 
 
 
