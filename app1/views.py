@@ -289,3 +289,32 @@ def remover_cartao(request, jogador_id, partida_id):
     
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+
+@require_http_methods(["POST"])
+def adicionar_substituicao(request, jogador_saida_id, jogador_entrada_id, partida_id):
+    # Obter jogador que saiu, jogador que entrou e a partida
+    jogador_saida = get_object_or_404(Jogador, id=jogador_saida_id)
+    jogador_entrada = get_object_or_404(Jogador, id=jogador_entrada_id)
+    partida = get_object_or_404(Partida, id=partida_id)
+
+    # Carregar os dados enviados na requisição (tempo, lado da substituição)
+    data = json.loads(request.body.decode('utf-8'))
+    subst_lado = data.get('subst_lado')  # Lado da substituição (casa/visitante)
+    tempo = data.get('tempo')  # Tempo do jogo
+
+    # Verificar se os campos obrigatórios foram passados
+    if not subst_lado or not tempo:
+        return JsonResponse({'error': 'Dados incompletos'}, status=400)
+
+    # Criar e salvar a substituição
+    substituicao = Substituicao(
+        jogador_saida=jogador_saida,
+        jogador_entrada=jogador_entrada,
+        partida=partida,
+        subst_lado=subst_lado,
+        tempo=tempo
+    )
+    substituicao.save()
+
+    return JsonResponse({'status': 'success', 'message': 'Substituição registrada com sucesso!'})
