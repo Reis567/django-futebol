@@ -150,3 +150,17 @@ class Cartao(models.Model):
         return f'{self.tipo_cartao.capitalize()} para {self.jogador.nome} aos {self.tempo}'
 
 
+class Substituicao(models.Model):
+    LADO_SUBST = [
+        ('CASA', 'casa'),
+        ('VISITANTE', 'visitante'),
+    ]
+    subst_lado = models.CharField(max_length=15, choices=LADO_SUBST, null=True, blank=True)
+    jogador_saida = models.ForeignKey(Jogador, on_delete=models.CASCADE, related_name='substituicoes_saiu')
+    jogador_entrada = models.ForeignKey(Jogador, on_delete=models.CASCADE, related_name='substituicoes_entrou')
+    partida = models.ForeignKey(Partida, on_delete=models.CASCADE, related_name='substituicoes')
+    tempo = models.CharField(max_length=10, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Substituicao: {self.jogador_saida.nome} por {self.jogador_entrada.nome} aos {self.tempo}'
