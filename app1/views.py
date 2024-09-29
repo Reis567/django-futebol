@@ -318,3 +318,37 @@ def adicionar_substituicao(request, jogador_saida_id, jogador_entrada_id, partid
     substituicao.save()
 
     return JsonResponse({'status': 'success', 'message': 'Substituição registrada com sucesso!'})
+
+
+@require_http_methods(["DELETE"])
+def remover_substituicao(request, jogador_saida_id, jogador_entrada_id, partida_id):
+    try:
+        # Carregar os dados enviados na requisição (lado e tempo da substituição)
+        data = json.loads(request.body.decode('utf-8'))
+        subst_lado = data.get('subst_lado')
+        tempo = data.get('tempo')
+
+        # Obter jogador que saiu, jogador que entrou e a partida com base nos IDs fornecidos
+        jogador_saida = get_object_or_404(Jogador, id=jogador_saida_id)
+        jogador_entrada = get_object_or_404(Jogador, id=jogador_entrada_id)
+        partida = get_object_or_404(Partida, id=partida_id)
+
+        # Encontrar a substituição com os detalhes especificados
+        substituicao = Substituicao.objects.filter(
+            jogador_saida=jogador_saida,
+            jogador_entrada=jogador_entrada,
+            partida=partida,
+            subst_lado=subst_lado,
+            tempo=tempo
+        ).order_by('-id').first()
+
+        if not substituicao:
+            return JsonResponse({'error': 'Substituição não encontrada'}, status=404)
+
+        # Remover a substituição encontrada
+        substituicao.delete()
+
+        return JsonResponse({'status': 'success', 'message': 'Substituição removida com sucesso!'})
+    
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
