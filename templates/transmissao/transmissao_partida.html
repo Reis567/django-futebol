@@ -134,7 +134,7 @@
             <div class="icone-acao" id="bola" draggable="true" data-tipo-gol="gol">⚽</div>
             <div class="icone-acao" id="cartao-amarelo" draggable="true" data-tipo-cartao="cartao_amarelo">🟨</div>
             <div class="icone-acao" id="cartao-vermelho" draggable="true" data-tipo-cartao="cartao_vermelho">🟥</div>
-            <div class="icone-acao" id="substituicao" draggable="true" data-tipo-gol="substituicao">🔄</div>
+            <div class="icone-acao" id="substituicao" draggable="true" data-tipo-substituicao="substituicao">🔄</div>
             <div class="icone-acao" id="gol-contra" draggable="true" data-tipo-gol="gol_contra">❌</div>
 
             
@@ -494,8 +494,87 @@
 
 
 
+<!-- SUBSTITUICAO -->
+<script>
+        // Função para abrir o modal
+    function abrirModalSubstituicao(jogadorId, jogadorNome, partidaId, tipoTime) {
+        const modal = document.getElementById("modalSubstituicao");
+        const jogadorEntradaSelect = document.getElementById("jogadorEntradaSelect");
 
+        // Abrir o modal
+        modal.style.display = "block";
 
+        // Carregar jogadores do banco (pode ser feito via API ou gerado no HTML)
+        jogadorEntradaSelect.innerHTML = '';  // Limpar jogadores anteriores
+        jogadoresDoBanco.forEach(jogador => {
+            let option = document.createElement('option');
+            option.value = jogador.id;
+            option.text = jogador.nome;
+            jogadorEntradaSelect.appendChild(option);
+        });
+
+        // Confirmar substituição
+        document.getElementById('confirmarSubstituicao').onclick = function () {
+            const jogadorEntradaId = jogadorEntradaSelect.value;
+            const tempoAtual = document.getElementById('cronometro').textContent;
+            const periodoAtual = document.getElementById('periodo').textContent;
+
+            // Fazer a requisição para registrar a substituição
+            fetch(`/partida/${partidaId}/substituicao/${jogadorId}/${jogadorEntradaId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    subst_lado: tipoTime,
+                    tempo: `${tempoAtual}/${periodoAtual}`
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Substituição registrada com sucesso:', data);
+                modal.style.display = "none";  // Fechar o modal
+            })
+            .catch(error => console.error('Erro ao registrar a substituição:', error));
+        };
+    }
+
+    // Função para fechar o modal
+    document.querySelector('.close').onclick = function () {
+        document.getElementById("modalSubstituicao").style.display = "none";
+    };
+
+    // Eventos de drag and drop para o ícone de substituição
+    const iconeSubstituicao = document.getElementById('substituicao');
+    iconeSubstituicao.addEventListener('dragstart', function (e) {
+        e.dataTransfer.setData('substituicao', 'true');  // Indica que é uma substituição
+    });
+
+    jogadores.forEach(jogador => {
+        const dropArea = jogador.querySelector('.drop-area');
+
+        dropArea.addEventListener('dragover', function (e) {
+            e.preventDefault();
+        });
+
+        dropArea.addEventListener('drop', function (e) {
+            e.preventDefault();
+            const isSubstituicao = e.dataTransfer.getData('substituicao');
+
+            if (isSubstituicao) {
+                const jogadorId = jogador.getAttribute('data-jogador-id');
+                const jogadorNome = jogador.querySelector('.nome-jogador').textContent;
+                const tipoTime = jogador.getAttribute('data-time');
+                const partidaId = {{ partida.id }};
+
+                // Abrir modal para escolher o jogador que vai entrar
+                abrirModalSubstituicao(jogadorId, jogadorNome, partidaId, tipoTime);
+            }
+        });
+    });
+
+</script>
 
 
 
