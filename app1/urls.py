@@ -10,4 +10,6 @@ urlpatterns = [
     path('time/<int:time_id>/', views.time_detail, name='time_detail'),
     path('partida/<int:partida_id>/jogador/<int:jogador_id>/adicionar_cartao/', views.adicionar_cartao, name='adicionar_cartao'),
     path('partida/<int:partida_id>/jogador/<int:jogador_id>/remover_cartao/', views.remover_cartao, name='remover_cartao'),
+    path('partida/<int:partida_id>/substituicao/<int:jogador_saida_id>/<int:jogador_entrada_id>/', views.adicionar_substituicao, name='adicionar_substituicao'),
+    path('partida/<int:partida_id>/substituicao/<int:jogador_saida_id>/<int:jogador_entrada_id>/', views.remover_substituicao, name='remover_substituicao'), 
 ]
