@@ -576,14 +576,24 @@
 
 </script>
 <!-- Modal de Substituição -->
-<div id="modalSubstituicao" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Escolha o jogador que vai entrar</h2>
-        <select id="jogadorEntradaSelect">
-            <!-- Jogadores do banco de dados serão carregados aqui -->
-        </select>
-        <button id="confirmarSubstituicao">Confirmar Substituição</button>
+<div class="modal fade" id="modalSubstituicao" tabindex="-1" role="dialog" aria-labelledby="modalSubstituicaoLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalSubstituicaoLabel">Escolha o Jogador para Substituição</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul id="lista-jogadores-banco">
+                    <!-- Jogadores do banco serão adicionados aqui -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
     </div>
 </div>
 
