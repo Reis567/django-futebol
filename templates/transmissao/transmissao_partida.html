@@ -496,84 +496,70 @@
 
 <!-- SUBSTITUICAO -->
 <script>
-        // Função para abrir o modal
-    function abrirModalSubstituicao(jogadorId, jogadorNome, partidaId, tipoTime) {
-        const modal = document.getElementById("modalSubstituicao");
-        const jogadorEntradaSelect = document.getElementById("jogadorEntradaSelect");
-
-        // Abrir o modal
-        modal.style.display = "block";
-
-        // Carregar jogadores do banco (pode ser feito via API ou gerado no HTML)
-        jogadorEntradaSelect.innerHTML = '';  // Limpar jogadores anteriores
-        jogadoresDoBanco.forEach(jogador => {
-            let option = document.createElement('option');
-            option.value = jogador.id;
-            option.text = jogador.nome;
-            jogadorEntradaSelect.appendChild(option);
+    document.addEventListener('DOMContentLoaded', function() {
+        const iconeSubstituicao = document.getElementById('substituicao');
+        const jogadoresTitulares = document.querySelectorAll('.jogadores .jogador');
+        
+        jogadoresTitulares.forEach(jogador => {
+            jogador.addEventListener('dragover', function(event) {
+                event.preventDefault(); // Permite o drop
+            });
+    
+            jogador.addEventListener('drop', function(event) {
+                event.preventDefault();
+                const jogadorId = this.getAttribute('data-jogador-id');
+                mostrarModalSubstituicao(jogadorId);
+            });
         });
-
-        // Confirmar substituição
-        document.getElementById('confirmarSubstituicao').onclick = function () {
-            const jogadorEntradaId = jogadorEntradaSelect.value;
-            const tempoAtual = document.getElementById('cronometro').textContent;
-            const periodoAtual = document.getElementById('periodo').textContent;
-
-            // Fazer a requisição para registrar a substituição
-            fetch(`/partida/${partidaId}/substituicao/${jogadorId}/${jogadorEntradaId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({
-                    subst_lado: tipoTime,
-                    tempo: `${tempoAtual}/${periodoAtual}`
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Substituição registrada com sucesso:', data);
-                modal.style.display = "none";  // Fechar o modal
-            })
-            .catch(error => console.error('Erro ao registrar a substituição:', error));
-        };
-    }
-
-    // Função para fechar o modal
-    document.querySelector('.close').onclick = function () {
-        document.getElementById("modalSubstituicao").style.display = "none";
-    };
-
-    // Eventos de drag and drop para o ícone de substituição
-    const iconeSubstituicao = document.getElementById('substituicao');
-    iconeSubstituicao.addEventListener('dragstart', function (e) {
-        e.dataTransfer.setData('substituicao', 'true');  // Indica que é uma substituição
+    
+        iconeSubstituicao.addEventListener('dragstart', function(event) {
+            event.dataTransfer.setData('text/plain', 'substituicao');
+        });
+    
+        function mostrarModalSubstituicao(jogadorId) {
+            // Preencher a lista de jogadores do banco
+            const listaJogadoresBanco = document.getElementById('lista-jogadores-banco');
+            listaJogadoresBanco.innerHTML = ''; // Limpar a lista anterior
+    
+            // Adicione os jogadores do banco ao modal
+            {% for jogador in banco_casa %}
+                const li = document.createElement('li');
+                li.textContent = '{{ jogador.nome }} ({{ jogador.numero_camisa }})';
+                li.setAttribute('data-jogador-id', '{{ jogador.id }}');
+                li.classList.add('jogador-banco');
+                listaJogadoresBanco.appendChild(li);
+            {% endfor %}
+    
+            // Exibir o modal
+            $('#modalSubstituicao').modal('show');
+    
+            // Ações ao clicar no jogador do banco
+            listaJogadoresBanco.querySelectorAll('.jogador-banco').forEach(item => {
+                item.addEventListener('click', function() {
+                    const jogadorBancoId = this.getAttribute('data-jogador-id');
+                    realizarSubstituicao(jogadorId, jogadorBancoId);
+                    $('#modalSubstituicao').modal('hide');
+                });
+            });
+        }
+    
+        function realizarSubstituicao(jogadorTitularId, jogadorBancoId) {
+            // Lógica para realizar a substituição
+            const jogadorTitular = document.querySelector(`.jogador[data-jogador-id="${jogadorTitularId}"]`);
+            const jogadorBanco = document.querySelector(`.jogador[data-jogador-id="${jogadorBancoId}"]`);
+    
+            // Atualizar o jogador titular com os dados do banco
+            jogadorTitular.querySelector('.nome-jogador').textContent = jogadorBanco.querySelector('.nome-jogador').textContent;
+            jogadorTitular.querySelector('.numero-jogador').textContent = jogadorBanco.querySelector('.numero-jogador').textContent;
+    
+            // Atualizar os gols, se necessário
+            jogadorTitular.querySelector('.gols-jogador').innerHTML = jogadorBanco.querySelector('.gols-jogador').innerHTML;
+    
+            // Remover o jogador do banco (opcional)
+            jogadorBanco.remove(); // Se quiser remover do banco após a substituição
+        }
     });
-
-    jogadores.forEach(jogador => {
-        const dropArea = jogador.querySelector('.drop-area');
-
-        dropArea.addEventListener('dragover', function (e) {
-            e.preventDefault();
-        });
-
-        dropArea.addEventListener('drop', function (e) {
-            e.preventDefault();
-            const isSubstituicao = e.dataTransfer.getData('substituicao');
-
-            if (isSubstituicao) {
-                const jogadorId = jogador.getAttribute('data-jogador-id');
-                const jogadorNome = jogador.querySelector('.nome-jogador').textContent;
-                const tipoTime = jogador.getAttribute('data-time');
-                const partidaId = {{ partida.id }};
-
-                // Abrir modal para escolher o jogador que vai entrar
-                abrirModalSubstituicao(jogadorId, jogadorNome, partidaId, tipoTime);
-            }
-        });
-    });
-
+    
 </script>
 <!-- Modal de Substituição -->
 <div class="modal fade" id="modalSubstituicao" tabindex="-1" role="dialog" aria-labelledby="modalSubstituicaoLabel" aria-hidden="true">
