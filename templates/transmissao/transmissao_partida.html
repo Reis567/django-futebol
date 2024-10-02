@@ -507,9 +507,13 @@
     
             jogador.addEventListener('drop', function(event) {
                 event.preventDefault();
-                const jogadorId = this.getAttribute('data-jogador-id');
-                mostrarModalSubstituicao(jogadorId);
+                const tipoAcao = event.dataTransfer.getData('text/plain');
+                if (tipoAcao === 'substituicao') {
+                    const jogadorId = this.getAttribute('data-jogador-id');
+                    mostrarModalSubstituicao(jogadorId);
+                }
             });
+            
         });
     
         iconeSubstituicao.addEventListener('dragstart', function(event) {
