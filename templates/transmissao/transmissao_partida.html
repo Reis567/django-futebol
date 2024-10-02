@@ -510,17 +510,16 @@
                 const tipoAcao = event.dataTransfer.getData('text/plain');
                 if (tipoAcao === 'substituicao') {
                     const jogadorId = this.getAttribute('data-jogador-id');
-                    mostrarModalSubstituicao(jogadorId);
+                    mostrarModalSubstituicao(jogadorId, this.getAttribute('data-time'));
                 }
             });
-            
         });
     
         iconeSubstituicao.addEventListener('dragstart', function(event) {
             event.dataTransfer.setData('text/plain', 'substituicao');
         });
     
-        function mostrarModalSubstituicao(jogadorId) {
+        function mostrarModalSubstituicao(jogadorId, ladoTime) {
             // Preencher a lista de jogadores do banco
             const listaJogadoresBanco = document.getElementById('lista-jogadores-banco');
             listaJogadoresBanco.innerHTML = ''; // Limpar a lista anterior
@@ -541,26 +540,38 @@
             listaJogadoresBanco.querySelectorAll('.jogador-banco').forEach(item => {
                 item.addEventListener('click', function() {
                     const jogadorBancoId = this.getAttribute('data-jogador-id');
-                    realizarSubstituicao(jogadorId, jogadorBancoId);
+                    const tempoAtual = document.getElementById('cronometro').textContent; // Captura o tempo do cronômetro
+                    realizarSubstituicao(jogadorId, jogadorBancoId, ladoTime, tempoAtual);
                     $('#modalSubstituicao').modal('hide');
                 });
             });
         }
     
-        function realizarSubstituicao(jogadorTitularId, jogadorBancoId) {
-            // Lógica para realizar a substituição
+        function realizarSubstituicao(jogadorTitularId, jogadorBancoId, ladoTime, tempo) {
+            // Atualizar o jogador titular com os dados do banco
             const jogadorTitular = document.querySelector(`.jogador[data-jogador-id="${jogadorTitularId}"]`);
             const jogadorBanco = document.querySelector(`.jogador[data-jogador-id="${jogadorBancoId}"]`);
-    
-            // Atualizar o jogador titular com os dados do banco
             jogadorTitular.querySelector('.nome-jogador').textContent = jogadorBanco.querySelector('.nome-jogador').textContent;
             jogadorTitular.querySelector('.numero-jogador').textContent = jogadorBanco.querySelector('.numero-jogador').textContent;
     
-            // Atualizar os gols, se necessário
-            jogadorTitular.querySelector('.gols-jogador').innerHTML = jogadorBanco.querySelector('.gols-jogador').innerHTML;
-    
-            // Remover o jogador do banco (opcional)
-            jogadorBanco.remove(); // Se quiser remover do banco após a substituição
+            // Realizar a requisição para registrar a substituição no banco de dados
+            const partidaId = {{ partida.id }};  // ID da partida
+            fetch(`/partida/${partidaId}/substituicao/${jogadorTitularId}/${jogadorBancoId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    subst_lado: ladoTime,  // Lado (casa ou visitante)
+                    tempo: tempo  // Tempo da substituição
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Substituição registrada com sucesso:', data);
+            })
+            .catch(error => console.error('Erro ao registrar a substituição:', error));
         }
     });
     
