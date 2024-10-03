@@ -431,20 +431,21 @@
         dropArea.addEventListener('drop', function (e) {
             e.preventDefault();
             const tipoGol = e.dataTransfer.getData('gol');
-
-            if (tipoGol) {
+            const tipoAcao = e.dataTransfer.getData('text/plain');
+        
+            if (tipoGol && !tipoAcao) {
                 const jogadorId = jogador.getAttribute('data-jogador-id');
                 const tipoTime = jogador.getAttribute('data-time');
                 const partidaId = {{ partida.id }};
                 const tempoAtual = document.getElementById('cronometro').textContent;
                 const periodoAtual = document.getElementById('periodo').textContent;
                 const nomeJogador = jogador.querySelector('.nome-jogador');
-
+        
                 const novoIcone = document.createElement('span');
                 novoIcone.classList.add('icone-substituicao');
                 novoIcone.textContent = tipoGol === 'gol' ? '⚽' : '❌';
                 novoIcone.dataset.tipoGol = tipoGol;
-
+        
                 novoIcone.addEventListener('click', function () {
                     nomeJogador.removeChild(novoIcone);
                     fetch(`/remover_gol/${jogadorId}/${partidaId}/${tipoGol}/`, {
@@ -464,9 +465,9 @@
                     })
                     .catch(error => console.error('Erro ao remover o gol:', error));
                 });
-
+        
                 nomeJogador.appendChild(novoIcone);
-
+        
                 fetch(`/registrar_gol/${jogadorId}/${partidaId}/${tipoGol}/`, {
                     method: 'POST',
                     headers: {
@@ -486,6 +487,7 @@
                 .catch(error => console.error('Erro ao registrar o gol:', error));
             }
         });
+        
     });
 
 </script>
@@ -576,6 +578,7 @@
     });
     
 </script>
+
 <!-- Modal de Substituição -->
 <div class="modal fade" id="modalSubstituicao" tabindex="-1" role="dialog" aria-labelledby="modalSubstituicaoLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -597,6 +600,7 @@
         </div>
     </div>
 </div>
+
 
 
 
