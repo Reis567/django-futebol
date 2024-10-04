@@ -67,14 +67,17 @@ def transmissao_partida(request, partida_id):
         output_field=IntegerField()
     )
 
+    # Ordenar jogadores titulares e do banco por posição
     titulares_casa = partida.time_casa.jogadores_titulares.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada')
     banco_casa = partida.time_casa.jogadores_banco.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada')
     titulares_visitante = partida.time_visitante.jogadores_titulares.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada')
     banco_visitante = partida.time_visitante.jogadores_banco.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada')
 
+    # Buscar gols de casa e visitante
     gols_casa = Gol.objects.filter(partida=partida, gol_tipo='CASA')
     gols_visitante = Gol.objects.filter(partida=partida, gol_tipo='VISITANTE')
 
+    # Adicionar os gols aos jogadores titulares da casa
     for gol in gols_casa:
         for jogador in titulares_casa:
             if jogador.id == gol.jogador.id:
@@ -85,6 +88,7 @@ def transmissao_partida(request, partida_id):
                     'gol_contra': gol.gol_contra
                 })
 
+    # Adicionar os gols aos jogadores titulares do visitante
     for gol in gols_visitante:
         for jogador in titulares_visitante:
             if jogador.id == gol.jogador.id:
@@ -95,9 +99,11 @@ def transmissao_partida(request, partida_id):
                     'gol_contra': gol.gol_contra
                 })
 
+    # Buscar gols contra da casa e do visitante
     gols_contra_casa = Gol.objects.filter(partida=partida, gol_contra=True, gol_tipo='CASA')
     gols_contra_visitante = Gol.objects.filter(partida=partida, gol_contra=True, gol_tipo='VISITANTE')
 
+    # Adicionar os gols contra aos jogadores titulares da casa
     for gol in gols_contra_casa:
         for jogador in titulares_casa:
             if jogador.id == gol.jogador.id:
@@ -109,6 +115,7 @@ def transmissao_partida(request, partida_id):
                         'gol_contra': True
                     })
 
+    # Adicionar os gols contra aos jogadores titulares do visitante
     for gol in gols_contra_visitante:
         for jogador in titulares_visitante:
             if jogador.id == gol.jogador.id:
@@ -119,6 +126,32 @@ def transmissao_partida(request, partida_id):
                         'tempo': gol.tempo,
                         'gol_contra': True
                     })
+
+    # Buscar os cartões da casa e do visitante
+    cartoes_casa = Cartao.objects.filter(partida=partida, lado_cartao='CASA')
+    cartoes_visitante = Cartao.objects.filter(partida=partida, lado_cartao='VISITANTE')
+
+    # Adicionar os cartões aos jogadores titulares da casa
+    for cartao in cartoes_casa:
+        for jogador in titulares_casa:
+            if jogador.id == cartao.jogador.id:
+                if not hasattr(jogador, 'cartoes'):
+                    jogador.cartoes = []
+                jogador.cartoes.append({
+                    'tipo': cartao.tipo_cartao,
+                    'tempo': cartao.tempo
+                })
+
+    # Adicionar os cartões aos jogadores titulares do visitante
+    for cartao in cartoes_visitante:
+        for jogador in titulares_visitante:
+            if jogador.id == cartao.jogador.id:
+                if not hasattr(jogador, 'cartoes'):
+                    jogador.cartoes = []
+                jogador.cartoes.append({
+                    'tipo': cartao.tipo_cartao,
+                    'tempo': cartao.tempo
+                })
 
     context = {
         'partida': partida,
