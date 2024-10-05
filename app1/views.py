@@ -55,7 +55,6 @@ def selecionar_partida(request):
 
     return render(request, 'transmissao/selecionar_partida.html', {'times': times, 'competicoes': competicoes})
 
-
 def transmissao_partida(request, partida_id):
     partida = get_object_or_404(Partida, id=partida_id)
 
@@ -125,10 +124,13 @@ def transmissao_partida(request, partida_id):
                     })
 
     # Busca e adiciona cartões
-    cartoes_casa = Cartao.objects.filter(partida=partida, lado_cartao='CASA')
-    cartoes_visitante = Cartao.objects.filter(partida=partida, lado_cartao='VISITANTE')
+    cartoes_casa = Cartao.objects.filter(partida=partida, lado_cartao='casa')
+    cartoes_visitante = Cartao.objects.filter(partida=partida, lado_cartao='visitante')
+
 
     for cartao in cartoes_casa:
+
+
         for jogador in titulares_casa:
             if jogador.id == cartao.jogador.id:
                 if not hasattr(jogador, 'cartoes'):
@@ -138,7 +140,10 @@ def transmissao_partida(request, partida_id):
                     'tempo': cartao.tempo
                 })
 
+
     for cartao in cartoes_visitante:
+
+
         for jogador in titulares_visitante:
             if jogador.id == cartao.jogador.id:
                 if not hasattr(jogador, 'cartoes'):
@@ -158,7 +163,6 @@ def transmissao_partida(request, partida_id):
     }
 
     return render(request, 'transmissao/transmissao_partida.html', context)
-
 
 
 def registrar_gol(request, jogador_id, partida_id, tipo_gol):

@@ -26,14 +26,11 @@
                         {% endfor %}
                         <!-- Exibir cartões do jogador -->
                         {% for cartao in jogador.cartoes %}
-                            <span class="icone-cartao">
-                                {% if cartao.tipo_cartao == 'AMARELO' %}
+                                {% if cartao.tipo == 'cartao_amarelo' %}
                                     🟨
                                 {% else %}
                                     🟥
                                 {% endif %}
-                                ({{ cartao.tempo }})
-                            </span>
                         {% endfor %}
                     </div>
 
@@ -61,6 +58,14 @@
                                 {% else %}
                                     <span class="icone-gol">⚽</span>
                                 {% endif %}
+                            {% endfor %}
+                            <!-- Exibir cartões do jogador -->
+                            {% for cartao in jogador.cartoes %}
+                                    {% if cartao.tipo == 'cartao_amarelo' %}
+                                        🟨
+                                    {% else %}
+                                        🟥
+                                    {% endif %}
                             {% endfor %}
                         </div>
 
@@ -168,14 +173,11 @@
                         {% endfor %}
                         <!-- Exibir cartões do jogador -->
                         {% for cartao in jogador.cartoes %}
-                            <span class="icone-cartao">
-                                {% if cartao.tipo_cartao == 'AMARELO' %}
+                                {% if cartao.tipo == 'cartao_amarelo' %}
                                     🟨
                                 {% else %}
                                     🟥
                                 {% endif %}
-                                ({{ cartao.tempo }})
-                            </span>
                         {% endfor %}
                     </div>
 
@@ -200,7 +202,14 @@
                                 {% else %}
                                     <span class="icone-gol">⚽</span>
                                 {% endif %}
-                                <span class="tempo-gol">{{ gol.tempo }}</span>
+                            {% endfor %}
+                            <!-- Exibir cartões do jogador -->
+                            {% for cartao in jogador.cartoes %}
+                                    {% if cartao.tipo == 'cartao_amarelo' %}
+                                        🟨
+                                    {% else %}
+                                        🟥
+                                    {% endif %}
                             {% endfor %}
                         </div>
 
