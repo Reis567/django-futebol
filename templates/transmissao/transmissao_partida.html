@@ -15,16 +15,25 @@
                     <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                     <div class="nome-jogador">{{ jogador.nome }}</div>
 
-                    <!-- Exibir gols do jogador -->
+                    <!-- Exibir gols e cartões do jogador -->
                     <div class="gols-jogador">
                         {% for gol in jogador.gols %}
                             {% if gol.gol_contra %}
-                            
                                 <span class="icone-gol-contra">❌</span>
                             {% else %}
-                                <!-- Exibe ícone de gol -->
                                 <span class="icone-gol">⚽</span>
                             {% endif %}
+                        {% endfor %}
+                        <!-- Exibir cartões do jogador -->
+                        {% for cartao in jogador.cartoes %}
+                            <span class="icone-cartao">
+                                {% if cartao.tipo_cartao == 'AMARELO' %}
+                                    🟨
+                                {% else %}
+                                    🟥
+                                {% endif %}
+                                ({{ cartao.tempo }})
+                            </span>
                         {% endfor %}
                     </div>
 
@@ -44,17 +53,14 @@
                         <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                         <div class="nome-jogador">{{ jogador.nome }}</div>
 
-                        <!-- Exibir gols do jogador -->
+                        <!-- Exibir gols e cartões do jogador -->
                         <div class="gols-jogador">
                             {% for gol in jogador.gols %}
                                 {% if gol.gol_contra %}
-                                    <!-- Exibe ícone de gol contra -->
                                     <span class="icone-gol-contra">❌</span>
                                 {% else %}
-                                    <!-- Exibe ícone de gol -->
                                     <span class="icone-gol">⚽</span>
                                 {% endif %}
-
                             {% endfor %}
                         </div>
 
@@ -142,8 +148,6 @@
     </div>
 
 
-
-
     <!-- Coluna do Time Visitante -->
     <div class="time time-visitante">
         <h2 class="time-nome">{{ partida.time_visitante.nome }}</h2>
@@ -153,19 +157,27 @@
                     <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                     <div class="nome-jogador">{{ jogador.nome }}</div>
 
-                        <!-- Exibir gols do jogador -->
-                        <div class="gols-jogador">
-                            {% for gol in jogador.gols %}
-                                {% if gol.gol_contra %}
-                                    <span class="icone-gol-contra">❌</span>
+                    <!-- Exibir gols e cartões do jogador -->
+                    <div class="gols-jogador">
+                        {% for gol in jogador.gols %}
+                            {% if gol.gol_contra %}
+                                <span class="icone-gol-contra">❌</span>
+                            {% else %}
+                                <span class="icone-gol">⚽</span>
+                            {% endif %}
+                        {% endfor %}
+                        <!-- Exibir cartões do jogador -->
+                        {% for cartao in jogador.cartoes %}
+                            <span class="icone-cartao">
+                                {% if cartao.tipo_cartao == 'AMARELO' %}
+                                    🟨
                                 {% else %}
-                                    <span class="icone-gol">⚽</span>
+                                    🟥
                                 {% endif %}
-
-                            {% endfor %}
-                        
-                        </div>
-
+                                ({{ cartao.tempo }})
+                            </span>
+                        {% endfor %}
+                    </div>
 
                     <div class="drop-area"></div> <!-- Área para eventos futuros -->
                 </div>
@@ -180,7 +192,7 @@
                         <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
                         <div class="nome-jogador">{{ jogador.nome }}</div>
 
-                        <!-- Exibir gols do jogador -->
+                        <!-- Exibir gols e cartões do jogador -->
                         <div class="gols-jogador">
                             {% for gol in jogador.gols %}
                                 {% if gol.gol_contra %}
@@ -190,9 +202,7 @@
                                 {% endif %}
                                 <span class="tempo-gol">{{ gol.tempo }}</span>
                             {% endfor %}
-                        
                         </div>
-
 
                         <div class="drop-area"></div>
                     </div>
