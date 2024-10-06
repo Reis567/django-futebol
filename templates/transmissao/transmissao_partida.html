@@ -549,24 +549,30 @@
         });
     
         function mostrarModalSubstituicao(jogadorId, ladoTime) {
-            // Preencher a lista de jogadores do banco
+            // Preencher a lista de jogadores do banco de forma visual
             const listaJogadoresBanco = document.getElementById('lista-jogadores-banco');
             listaJogadoresBanco.innerHTML = ''; // Limpar a lista anterior
     
-            // Adicione os jogadores do banco ao modal
+            // Adicione os jogadores do banco ao modal com um estilo melhorado
             {% for jogador in banco_casa %}
-                const li = document.createElement('li');
-                li.textContent = '{{ jogador.nome }} ({{ jogador.numero_camisa }})';
-                li.setAttribute('data-jogador-id', '{{ jogador.id }}');
-                li.classList.add('jogador-banco');
-                listaJogadoresBanco.appendChild(li);
+                const jogadorContainer = document.createElement('div');
+                jogadorContainer.classList.add('jogador-banco-container');
+                jogadorContainer.setAttribute('data-jogador-id', '{{ jogador.id }}');
+
+                const jogadorNome = document.createElement('p');
+                jogadorNome.textContent = '{{ jogador.nome }} ({{ jogador.numero_camisa }})';
+                jogadorNome.classList.add('jogador-banco-nome');
+                
+                // Adicionando a estrutura ao modal
+                jogadorContainer.appendChild(jogadorNome);
+                listaJogadoresBanco.appendChild(jogadorContainer);
             {% endfor %}
     
             // Exibir o modal
             $('#modalSubstituicao').modal('show');
     
             // Ações ao clicar no jogador do banco
-            listaJogadoresBanco.querySelectorAll('.jogador-banco').forEach(item => {
+            document.querySelectorAll('.jogador-banco-container').forEach(item => {
                 item.addEventListener('click', function() {
                     const jogadorBancoId = this.getAttribute('data-jogador-id');
                     const tempoAtual = document.getElementById('cronometro').textContent; // Captura o tempo do cronômetro
@@ -580,9 +586,10 @@
             // Atualizar o jogador titular com os dados do banco
             const jogadorTitular = document.querySelector(`.jogador[data-jogador-id="${jogadorTitularId}"]`);
             const jogadorBanco = document.querySelector(`.jogador[data-jogador-id="${jogadorBancoId}"]`);
-            jogadorTitular.querySelector('.nome-jogador').textContent = jogadorBanco.querySelector('.nome-jogador').textContent;
-            jogadorTitular.querySelector('.numero-jogador').textContent = jogadorBanco.querySelector('.numero-jogador').textContent;
-    
+
+            // Trocar nome, número, gols e cartões
+            trocarDadosJogadores(jogadorTitular, jogadorBanco);
+
             // Realizar a requisição para registrar a substituição no banco de dados
             const partidaId = {{ partida.id }};  // ID da partida
             fetch(`/partida/${partidaId}/substituicao/${jogadorTitularId}/${jogadorBancoId}/`, {
@@ -602,9 +609,50 @@
             })
             .catch(error => console.error('Erro ao registrar a substituição:', error));
         }
+
+        // Função para trocar os dados dos jogadores, incluindo gols e cartões
+        function trocarDadosJogadores(jogadorTitular, jogadorBanco) {
+            // Troca de nome e número da camisa
+            const nomeTitular = jogadorTitular.querySelector('.nome-jogador').textContent;
+            const numeroTitular = jogadorTitular.querySelector('.numero-jogador').textContent;
+
+            jogadorTitular.querySelector('.nome-jogador').textContent = jogadorBanco.querySelector('.nome-jogador').textContent;
+            jogadorTitular.querySelector('.numero-jogador').textContent = jogadorBanco.querySelector('.numero-jogador').textContent;
+
+            jogadorBanco.querySelector('.nome-jogador').textContent = nomeTitular;
+            jogadorBanco.querySelector('.numero-jogador').textContent = numeroTitular;
+
+            // Trocar gols
+            const golsTitular = jogadorTitular.querySelector('.gols-jogador').innerHTML;
+            jogadorTitular.querySelector('.gols-jogador').innerHTML = jogadorBanco.querySelector('.gols-jogador').innerHTML;
+            jogadorBanco.querySelector('.gols-jogador').innerHTML = golsTitular;
+
+            // Trocar cartões (se houver)
+            const cartoesTitular = jogadorTitular.querySelector('.cartoes-jogador') ? jogadorTitular.querySelector('.cartoes-jogador').innerHTML : '';
+            const cartoesBanco = jogadorBanco.querySelector('.cartoes-jogador') ? jogadorBanco.querySelector('.cartoes-jogador').innerHTML : '';
+
+            if (jogadorTitular.querySelector('.cartoes-jogador')) {
+                jogadorTitular.querySelector('.cartoes-jogador').innerHTML = cartoesBanco;
+            } else if (cartoesBanco) {
+                const cartoesDivTitular = document.createElement('div');
+                cartoesDivTitular.classList.add('cartoes-jogador');
+                cartoesDivTitular.innerHTML = cartoesBanco;
+                jogadorTitular.querySelector('.gols-jogador').appendChild(cartoesDivTitular);
+            }
+
+            if (jogadorBanco.querySelector('.cartoes-jogador')) {
+                jogadorBanco.querySelector('.cartoes-jogador').innerHTML = cartoesTitular;
+            } else if (cartoesTitular) {
+                const cartoesDivBanco = document.createElement('div');
+                cartoesDivBanco.classList.add('cartoes-jogador');
+                cartoesDivBanco.innerHTML = cartoesTitular;
+                jogadorBanco.querySelector('.gols-jogador').appendChild(cartoesDivBanco);
+            }
+        }
     });
-    
 </script>
+
+
 
 <!-- Modal de Substituição -->
 <div class="modal fade" id="modalSubstituicao" tabindex="-1" role="dialog" aria-labelledby="modalSubstituicaoLabel" aria-hidden="true">
@@ -612,21 +660,23 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalSubstituicaoLabel">Escolha o Jogador para Substituição</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <ul id="lista-jogadores-banco">
+                <div id="lista-jogadores-banco" class="jogadores-lista-banco">
                     <!-- Jogadores do banco serão adicionados aqui -->
-                </ul>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
     </div>
 </div>
+
+
 
 
 
@@ -684,6 +734,36 @@
 </script>
 
 
-
+<style>
+    .jogadores-lista-banco {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .jogador-banco-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    .jogador-banco-container:hover {
+        background-color: #f0f0f0;
+    }
+    
+    .jogador-banco-nome {
+        margin-top: 5px;
+        font-weight: bold;
+        font-size: 14px;
+        text-align: center;
+    }
+    
+</style>
 
 {% endblock %}

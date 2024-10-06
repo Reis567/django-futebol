@@ -32,6 +32,12 @@
     width: 100%;
 }
 
+.banco {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
 .jogador {
     display: flex;
     align-items: center;
