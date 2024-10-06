@@ -13,7 +13,12 @@
             {% for jogador in titulares_casa %}
                 <div class="jogador" data-jogador-id="{{ jogador.id }}" data-time="casa">
                     <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
-                    <div class="nome-jogador">{{ jogador.nome }}</div>
+                    <div class="nome-jogador">
+                        {{ jogador.nome }}
+                        {% if jogador.foi_substituido %}
+                            <span class="icone-substituicao">🔄</span>
+                        {% endif %}
+                    </div>
 
                     <!-- Exibir gols e cartões do jogador -->
                     <div class="gols-jogador">
@@ -26,11 +31,11 @@
                         {% endfor %}
                         <!-- Exibir cartões do jogador -->
                         {% for cartao in jogador.cartoes %}
-                                {% if cartao.tipo == 'cartao_amarelo' %}
-                                    🟨
-                                {% else %}
-                                    🟥
-                                {% endif %}
+                            {% if cartao.tipo == 'cartao_amarelo' %}
+                                🟨
+                            {% else %}
+                                🟥
+                            {% endif %}
                         {% endfor %}
                     </div>
 
@@ -48,7 +53,12 @@
                 {% for jogador in banco_casa %}
                     <div class="jogador" data-jogador-id="{{ jogador.id }}" data-time="casa">
                         <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
-                        <div class="nome-jogador">{{ jogador.nome }}</div>
+                        <div class="nome-jogador">
+                            {{ jogador.nome }}
+                            {% if jogador.foi_substituido %}
+                                <span class="icone-substituicao">🔄</span>
+                            {% endif %}
+                        </div>
 
                         <!-- Exibir gols e cartões do jogador -->
                         <div class="gols-jogador">
@@ -61,11 +71,11 @@
                             {% endfor %}
                             <!-- Exibir cartões do jogador -->
                             {% for cartao in jogador.cartoes %}
-                                    {% if cartao.tipo == 'cartao_amarelo' %}
-                                        🟨
-                                    {% else %}
-                                        🟥
-                                    {% endif %}
+                                {% if cartao.tipo == 'cartao_amarelo' %}
+                                    🟨
+                                {% else %}
+                                    🟥
+                                {% endif %}
                             {% endfor %}
                         </div>
 
@@ -153,14 +163,21 @@
     </div>
 
 
+
     <!-- Coluna do Time Visitante -->
     <div class="time time-visitante">
         <h2 class="time-nome">{{ partida.time_visitante.nome }}</h2>
         <div class="jogadores">
+            <!-- Jogadores titulares do time visitante -->
             {% for jogador in titulares_visitante %}
                 <div class="jogador" data-jogador-id="{{ jogador.id }}" data-time="visitante">
                     <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
-                    <div class="nome-jogador">{{ jogador.nome }}</div>
+                    <div class="nome-jogador">
+                        {{ jogador.nome }}
+                        {% if jogador.foi_substituido %}
+                            <span class="icone-substituicao">🔄</span>
+                        {% endif %}
+                    </div>
 
                     <!-- Exibir gols e cartões do jogador -->
                     <div class="gols-jogador">
@@ -173,18 +190,19 @@
                         {% endfor %}
                         <!-- Exibir cartões do jogador -->
                         {% for cartao in jogador.cartoes %}
-                                {% if cartao.tipo == 'cartao_amarelo' %}
-                                    🟨
-                                {% else %}
-                                    🟥
-                                {% endif %}
+                            {% if cartao.tipo == 'cartao_amarelo' %}
+                                🟨
+                            {% else %}
+                                🟥
+                            {% endif %}
                         {% endfor %}
                     </div>
 
-                    <div class="drop-area"></div> <!-- Área para eventos futuros -->
+                    <div class="drop-area"></div>
                 </div>
             {% endfor %}
         </div>
+
         <div class="tecnico">Técnico: {{ partida.time_visitante.tecnico }}</div>
         <div class="banco">
             <h3>Banco de Reservas</h3>
@@ -192,7 +210,12 @@
                 {% for jogador in banco_visitante %}
                     <div class="jogador" data-jogador-id="{{ jogador.id }}" data-time="visitante">
                         <div class="numero-jogador">{{ jogador.numero_camisa }}</div>
-                        <div class="nome-jogador">{{ jogador.nome }}</div>
+                        <div class="nome-jogador">
+                            {{ jogador.nome }}
+                            {% if jogador.foi_substituido %}
+                                <span class="icone-substituicao">🔄</span>
+                            {% endif %}
+                        </div>
 
                         <!-- Exibir gols e cartões do jogador -->
                         <div class="gols-jogador">
@@ -205,11 +228,11 @@
                             {% endfor %}
                             <!-- Exibir cartões do jogador -->
                             {% for cartao in jogador.cartoes %}
-                                    {% if cartao.tipo == 'cartao_amarelo' %}
-                                        🟨
-                                    {% else %}
-                                        🟥
-                                    {% endif %}
+                                {% if cartao.tipo == 'cartao_amarelo' %}
+                                    🟨
+                                {% else %}
+                                    🟥
+                                {% endif %}
                             {% endfor %}
                         </div>
 
