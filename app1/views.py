@@ -54,6 +54,8 @@ def selecionar_partida(request):
         return redirect('transmissao_partida', partida_id=partida.id)
 
     return render(request, 'transmissao/selecionar_partida.html', {'times': times, 'competicoes': competicoes})
+
+
 def transmissao_partida(request, partida_id):
     partida = get_object_or_404(Partida, id=partida_id)
 
@@ -67,14 +69,20 @@ def transmissao_partida(request, partida_id):
     )
 
     # Obtém os jogadores titulares e banco de reservas para ambos os times
-    titulares_casa = partida.time_casa.jogadores_titulares.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada')
-    banco_casa = partida.time_casa.jogadores_banco.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada')
-    titulares_visitante = partida.time_visitante.jogadores_titulares.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada')
-    banco_visitante = partida.time_visitante.jogadores_banco.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada')
+    titulares_casa = list(partida.time_casa.jogadores_titulares.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada'))
+    banco_casa = list(partida.time_casa.jogadores_banco.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada'))
+    titulares_visitante = list(partida.time_visitante.jogadores_titulares.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada'))
+    banco_visitante = list(partida.time_visitante.jogadores_banco.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada'))
 
     # Carregar as substituições da partida
     substituicoes_casa = Substituicao.objects.filter(partida=partida, subst_lado='casa')
     substituicoes_visitante = Substituicao.objects.filter(partida=partida, subst_lado='visitante')
+
+    # Inicializando o atributo foi_substituido para cada jogador
+    for jogador in titulares_casa + banco_casa:
+        jogador.foi_substituido = False
+    for jogador in titulares_visitante + banco_visitante:
+        jogador.foi_substituido = False
 
     # Tratamento das substituições para o time da casa
     for substituicao in substituicoes_casa:
@@ -85,18 +93,16 @@ def transmissao_partida(request, partida_id):
         for jogador in titulares_casa:
             if jogador.id == jogador_saida.id:
                 jogador.foi_substituido = True  # Marca que foi substituído
-                # Adiciona o jogador que saiu ao banco
-                banco_casa |= titulares_casa.filter(id=jogador_saida.id)
-                titulares_casa = titulares_casa.exclude(id=jogador_saida.id)  # Remove o jogador dos titulares
+                banco_casa.append(jogador)
+                titulares_casa.remove(jogador)
                 break
 
         # Adiciona o jogador que entrou na lista de titulares e remove do banco
         for jogador in banco_casa:
             if jogador.id == jogador_entrada.id:
                 jogador.foi_substituido = True  # Marca que foi substituído
-                # Adiciona o jogador do banco aos titulares
-                titulares_casa |= banco_casa.filter(id=jogador_entrada.id)
-                banco_casa = banco_casa.exclude(id=jogador_entrada.id)  # Remove o jogador do banco
+                titulares_casa.append(jogador)
+                banco_casa.remove(jogador)
                 break
 
     # Tratamento das substituições para o time visitante
@@ -108,18 +114,16 @@ def transmissao_partida(request, partida_id):
         for jogador in titulares_visitante:
             if jogador.id == jogador_saida.id:
                 jogador.foi_substituido = True  # Marca que foi substituído
-                # Adiciona o jogador que saiu ao banco
-                banco_visitante |= titulares_visitante.filter(id=jogador_saida.id)
-                titulares_visitante = titulares_visitante.exclude(id=jogador_saida.id)  # Remove o jogador dos titulares
+                banco_visitante.append(jogador)
+                titulares_visitante.remove(jogador)
                 break
 
         # Adiciona o jogador que entrou na lista de titulares e remove do banco
         for jogador in banco_visitante:
             if jogador.id == jogador_entrada.id:
                 jogador.foi_substituido = True  # Marca que foi substituído
-                # Adiciona o jogador do banco aos titulares
-                titulares_visitante |= banco_visitante.filter(id=jogador_entrada.id)
-                banco_visitante = banco_visitante.exclude(id=jogador_entrada.id)  # Remove o jogador do banco
+                titulares_visitante.append(jogador)
+                banco_visitante.remove(jogador)
                 break
 
     # Busca e adiciona gols
@@ -147,8 +151,8 @@ def transmissao_partida(request, partida_id):
                 })
 
     # Busca e adiciona gols contra
-    gols_contra_casa = Gol.objects.filter(partida=partida, gol_contra=True, gol_tipo='CASA')
-    gols_contra_visitante = Gol.objects.filter(partida=partida, gol_contra=True, gol_tipo='VISITANTE')
+    gols_contra_casa = Gol.objects.filter(partida=partida, gol_contra=True, gol_tipo='casa')
+    gols_contra_visitante = Gol.objects.filter(partida=partida, gol_contra=True, gol_tipo='visitante')
 
     for gol in gols_contra_casa:
         for jogador in titulares_casa:
@@ -196,7 +200,7 @@ def transmissao_partida(request, partida_id):
                     'tempo': cartao.tempo
                 })
 
-    # Prepara o contexto para o template
+
     context = {
         'partida': partida,
         'titulares_casa': titulares_casa,
@@ -206,6 +210,7 @@ def transmissao_partida(request, partida_id):
     }
 
     return render(request, 'transmissao/transmissao_partida.html', context)
+
 
 
 def registrar_gol(request, jogador_id, partida_id, tipo_gol):
