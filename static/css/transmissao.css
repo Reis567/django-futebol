@@ -189,3 +189,13 @@
 .carousel-item img{
     max-height: 250px;
 }    
+
+
+.partida-finalizada {
+    font-size: 2rem;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}

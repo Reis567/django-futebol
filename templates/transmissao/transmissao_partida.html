@@ -89,25 +89,33 @@
 
     <!-- Coluna Central -->
     <div class="central">
-        <div class="periodo" id="periodo">1T</div> <!-- Div para alternar o período -->
-        <div class="placar">
-            <h1>
-                {{ partida.time_casa.sigla }}
-                <span class="placar-casa">{{ partida.placar_casa }}</span>
-            </h1>
-            <div class="cronometro" id="cronometro">00:00</div>
-            <h1>
-                <span class="placar-visitante">{{ partida.placar_visitante }}</span>
-                {{ partida.time_visitante.sigla }}
-            </h1>
-        </div>
+        {% if partida.status == 'FINALIZADA' %}
+            <div class="partida-finalizada">
+                <h2>Partida Finalizada</h2>
+            </div>
+        {% else %}
+            <div class="periodo" id="periodo">{{ periodo_atual }}</div> <!-- Exibir o período apenas se não estiver finalizada -->
+            <div class="placar">
+                <h1>
+                    {{ partida.time_casa.sigla }}
+                    <span class="placar-casa">{{ partida.placar_casa }}</span>
+                </h1>
+                <div class="cronometro" id="cronometro">{{ cronometro_atual }}</div> <!-- Exibir o cronômetro apenas se não estiver finalizada -->
+                <h1>
+                    <span class="placar-visitante">{{ partida.placar_visitante }}</span>
+                    {{ partida.time_visitante.sigla }}
+                </h1>
+            </div>
+        {% endif %}
+        
         <div class="competicao">
             <p>{{ partida.competicao.nome }}</p>
         </div>
+
+        <!-- Continuar com o restante do código -->
         <div class="webcams-container">
             <div class="webcam-selectors">
                 <select id="webcam-selector-1"></select>
-
                 <select id="webcam-selector-2"></select>
             </div>
 
@@ -120,11 +128,8 @@
                 </div>
             </div>
         </div>
-        
-        
-        
-        
-        <!-- Patrocinadores com Carrossel -->
+
+        <!-- Patrocinadores -->
         <div class="patrocinadores">
             <p>Patrocinadores</p>
             <div id="carouselPatrocinadores" class="carousel slide" data-bs-ride="carousel">
@@ -139,7 +144,6 @@
                         <img src="{% static 'imgs/patroc.jpg' %}" class="d-block w-100" alt="Terceiro slide">
                     </div>
                 </div>
-                <!-- Controles do carrossel -->
                 <a class="carousel-control-prev" href="#carouselPatrocinadores" role="button" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="sr-only">Previous</span>
@@ -157,10 +161,9 @@
             <div class="icone-acao" id="cartao-vermelho" draggable="true" data-tipo-cartao="cartao_vermelho">🟥</div>
             <div class="icone-acao" id="substituicao" draggable="true" data-tipo-substituicao="substituicao">🔄</div>
             <div class="icone-acao" id="gol-contra" draggable="true" data-tipo-gol="gol_contra">❌</div>
-
-            
         </div>
     </div>
+
 
 
 
@@ -792,11 +795,10 @@
 
 
 
-
+<!-- FINALIZAR PARTIDA -->
 <form method="post" id="finalizar-partida-form">
     {% csrf_token %}
 </form>
-<!-- FINALIZAR PARTIDA -->
 <script>
     document.addEventListener('keydown', function(event) {
         if (event.ctrlKey && event.key === 'End') {
