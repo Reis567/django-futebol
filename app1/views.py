@@ -433,3 +433,11 @@ def remover_substituicao(request, jogador_saida_id, jogador_entrada_id, partida_
     
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+
+@require_http_methods(["POST"])
+def finalizar_partida(request, partida_id):
+    partida = get_object_or_404(Partida, id=partida_id)
+    partida.encerrar_jogo()  # Função que altera o status para 'FINALIZADA'
+    return JsonResponse({'status': 'success', 'message': 'Partida finalizada com sucesso!'})

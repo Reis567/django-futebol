@@ -12,4 +12,5 @@ urlpatterns = [
     path('partida/<int:partida_id>/jogador/<int:jogador_id>/remover_cartao/', views.remover_cartao, name='remover_cartao'),
     path('partida/<int:partida_id>/substituicao/<int:jogador_saida_id>/<int:jogador_entrada_id>/', views.adicionar_substituicao, name='adicionar_substituicao'),
     path('partida/<int:partida_id>/substituicao/<int:jogador_saida_id>/<int:jogador_entrada_id>/', views.remover_substituicao, name='remover_substituicao'), 
+    path('finalizar_partida/<int:partida_id>/', views.finalizar_partida, name='finalizar_partida'),
 ]

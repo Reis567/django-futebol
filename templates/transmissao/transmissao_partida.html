@@ -789,4 +789,44 @@
     
 </style>
 
+
+
+
+
+<form method="post" id="finalizar-partida-form">
+    {% csrf_token %}
+</form>
+<!-- FINALIZAR PARTIDA -->
+<script>
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.key === 'End') {
+            event.preventDefault();  // Previne o comportamento padrão da tecla End
+
+            const partidaId = {{ partida.id }};
+            
+            // Enviar requisição POST para finalizar a partida
+            fetch(`/finalizar_partida/${partidaId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Partida finalizada com sucesso!');
+                    // Aqui você pode adicionar qualquer lógica adicional, como atualizar a página
+                } else {
+                    alert('Erro ao finalizar a partida.');
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao finalizar a partida:', error);
+            });
+        }
+    });
+</script>
+
+
 {% endblock %}
