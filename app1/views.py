@@ -1,38 +1,45 @@
 from django.shortcuts import render, get_object_or_404
 from .models import *
 from django.shortcuts import redirect
-from django.db.models import Count, Q
+from django.db.models import Count, Q,F
 from django.db.models import Case, When, IntegerField
 from django.http import JsonResponse
 import json
 from django.views.decorators.http import require_http_methods
 
 
-
-
-
-
-
-
 def home(request):
-    # Contando corretamente os jogadores titulares e os do banco para cada time
+    # Contar corretamente as partidas finalizadas para cada time e somar os jogadores titulares e do banco
     times = Time.objects.annotate(
-        num_jogadores=Count('jogadores_titulares', distinct=True) + Count('jogadores_banco', distinct=True),
-        num_partidas=Count(
-            'time_casa', filter=Q(time_casa__status='FINALIZADA')
-        ) + Count(
-            'time_visitante', filter=Q(time_visitante__status='FINALIZADA')
+        num_titulares=Count('jogadores_titulares', distinct=True),  # Contando titulares
+        num_banco=Count('jogadores_banco', distinct=True),  # Contando banco
+        num_partidas_casa=Count(
+            'time_casa', filter=Q(time_casa__status='FINALIZADA'), distinct=True
+        ),
+        num_partidas_visitante=Count(
+            'time_visitante', filter=Q(time_visitante__status='FINALIZADA'), distinct=True
         )
+    ).annotate(
+        total_partidas=F('num_partidas_casa') + F('num_partidas_visitante'),  # Somando as partidas como casa e visitante
+        total_jogadores=F('num_titulares') + F('num_banco')  # Somando titulares e banco
     )
-    jogadores = Jogador.objects.all()
-    for jogador in jogadores:
-        print(jogador.nome)
 
-    for time in times:
-        print(f"Time: {time.nome} - Jogadores: {time.num_jogadores}")
+    # Listar todas as partidas finalizadas
     partidas = Partida.objects.filter(status='FINALIZADA')
-    
+
+    # Exibir informações para debug
+    for time in times:
+        print(f"Time: {time.nome} - Total de partidas finalizadas: {time.total_partidas} - Total de jogadores: {time.total_jogadores}")
+
     return render(request, 'home.html', {'times': times, 'partidas': partidas})
+
+
+
+
+
+
+
+
 
 def selecionar_partida(request):
     times = Time.objects.all()
