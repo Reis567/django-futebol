@@ -55,7 +55,7 @@ def criar_time(request):
     else:
         form = TimeForm()
 
-    return render(request, 'criar_time.html', {'form': form})
+    return render(request, 'time/criar_time.html', {'form': form})
 
 
 
