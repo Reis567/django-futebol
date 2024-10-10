@@ -6,7 +6,7 @@ from django.db.models import Case, When, IntegerField
 from django.http import JsonResponse
 import json
 from django.views.decorators.http import require_http_methods
-
+from .forms import *
 
 def home(request):
     # Contar corretamente as partidas finalizadas para cada time e somar os jogadores titulares e do banco
@@ -34,6 +34,28 @@ def home(request):
     return render(request, 'home.html', {'times': times, 'partidas': partidas})
 
 
+
+
+
+
+def criar_time(request):
+    if request.method == 'POST':
+        form = TimeForm(request.POST)
+        if form.is_valid():
+            # Criar o time
+            time = form.save(commit=False)
+            time.save()
+
+            # Salvar os jogadores selecionados
+            form.save_m2m()  # Salva o ManyToManyField
+            form.cleaned_data['jogadores_titulares'].update(time=time)
+            form.cleaned_data['jogadores_banco'].update(time=time)
+
+            return redirect('home')  # Redirecionar para a home ou qualquer outra página
+    else:
+        form = TimeForm()
+
+    return render(request, 'criar_time.html', {'form': form})
 
 
 
