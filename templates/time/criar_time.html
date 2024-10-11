@@ -4,9 +4,44 @@
 {% block content %}
     <div class="container">
         <h2>Criar Novo Time</h2>
+
+        <form method="GET" class="form-inline mb-3">
+            <!-- Filtros de pesquisa por nome e posição -->
+            <div class="form-group mr-3">
+                <input type="text" class="form-control" name="nome_jogador" placeholder="Pesquisar por nome" value="{{ nome_jogador }}">
+            </div>
+            <div class="form-group">
+                <select class="form-control" name="posicao_jogador">
+                    <option value="">Filtrar por Posição</option>
+                    {% for valor, nome in posicoes %}
+                        <option value="{{ valor }}" {% if posicao_jogador == valor %}selected{% endif %}>{{ nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary ml-2">Filtrar</button>
+        </form>
+
         <form method="POST">
             {% csrf_token %}
             {{ form.as_p }}
+
+            <div class="form-group">
+                <label for="id_jogadores_titulares">Selecionar Jogadores Titulares:</label>
+                <select id="id_jogadores_titulares" class="form-control selectpicker" name="jogadores_titulares" multiple data-live-search="true">
+                    {% for jogador in jogadores %}
+                        <option value="{{ jogador.id }}">{{ jogador.nome }} - {{ jogador.get_posicao_display }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="id_jogadores_banco">Selecionar Jogadores para o Banco:</label>
+                <select id="id_jogadores_banco" class="form-control selectpicker" name="jogadores_banco" multiple data-live-search="true">
+                    {% for jogador in jogadores %}
+                        <option value="{{ jogador.id }}">{{ jogador.nome }} - {{ jogador.get_posicao_display }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
             <button type="submit" class="btn btn-primary">Criar Time</button>
             <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
@@ -14,7 +49,7 @@
     </div>
 
     <style>
-        /* Estilo para a página de criação de time */
+        /* Estilo adicional */
         .container {
             margin-top: 30px;
         }
@@ -25,4 +60,14 @@
             margin-top: 10px;
         }
     </style>
+
+    <!-- Adiciona o Bootstrap Select para múltipla escolha e busca -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('.selectpicker').selectpicker();
+        });
+    </script>
 {% endblock %}
