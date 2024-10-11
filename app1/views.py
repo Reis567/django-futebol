@@ -39,6 +39,19 @@ def home(request):
 
 
 def criar_time(request):
+    # Obter todas as posições e jogadores
+    POSICOES = Jogador.POSICOES
+
+    # Filtrar jogadores com base na pesquisa por nome e posição
+    nome_jogador = request.GET.get('nome_jogador', '')
+    posicao_jogador = request.GET.get('posicao_jogador', '')
+
+    jogadores = Jogador.objects.all()
+    if nome_jogador:
+        jogadores = jogadores.filter(nome__icontains=nome_jogador)
+    if posicao_jogador:
+        jogadores = jogadores.filter(posicao=posicao_jogador)
+
     if request.method == 'POST':
         form = TimeForm(request.POST)
         if form.is_valid():
@@ -51,11 +64,19 @@ def criar_time(request):
             form.cleaned_data['jogadores_titulares'].update(time=time)
             form.cleaned_data['jogadores_banco'].update(time=time)
 
-            return redirect('home')  # Redirecionar para a home ou qualquer outra página
+            return redirect('home')  # Redirecionar para a home
     else:
         form = TimeForm()
 
-    return render(request, 'time/criar_time.html', {'form': form})
+    context = {
+        'form': form,
+        'jogadores': jogadores,
+        'posicoes': POSICOES,
+        'nome_jogador': nome_jogador,
+        'posicao_jogador': posicao_jogador,
+    }
+
+    return render(request, 'time/criar_time.html', context)
 
 
 
