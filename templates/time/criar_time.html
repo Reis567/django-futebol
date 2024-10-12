@@ -4,43 +4,45 @@
 {% block content %}
     <div class="container">
         <h2>Criar Novo Time</h2>
-
-        <form method="GET" class="form-inline mb-3">
-            <!-- Filtros de pesquisa por nome e posição -->
-            <div class="form-group mr-3">
-                <input type="text" class="form-control" name="nome_jogador" placeholder="Pesquisar por nome" value="{{ nome_jogador }}">
-            </div>
-            <div class="form-group">
-                <select class="form-control" name="posicao_jogador">
-                    <option value="">Filtrar por Posição</option>
-                    {% for valor, nome in posicoes %}
-                        <option value="{{ valor }}" {% if posicao_jogador == valor %}selected{% endif %}>{{ nome }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary ml-2">Filtrar</button>
-        </form>
-
         <form method="POST">
             {% csrf_token %}
-            {{ form.as_p }}
+            {{ form.non_field_errors }}
 
             <div class="form-group">
-                <label for="id_jogadores_titulares">Selecionar Jogadores Titulares:</label>
-                <select id="id_jogadores_titulares" class="form-control selectpicker" name="jogadores_titulares" multiple data-live-search="true">
-                    {% for jogador in jogadores %}
-                        <option value="{{ jogador.id }}">{{ jogador.nome }} - {{ jogador.get_posicao_display }}</option>
-                    {% endfor %}
+                <label for="nome">Nome do Time:</label>
+                {{ form.nome }}
+            </div>
+
+            <div class="form-group">
+                <label for="sigla">Sigla do Time:</label>
+                {{ form.sigla }}
+            </div>
+
+            <div class="form-group">
+                <label for="tecnico">Nome do Técnico:</label>
+                {{ form.tecnico }}
+            </div>
+
+            <!-- Pesquisa por nome e posição -->
+            <div class="form-group">
+                <input type="text" id="pesquisaNome" class="form-control" placeholder="Pesquisar por nome">
+                <select id="pesquisaPosicao" class="form-control mt-2">
+                    <option value="">Filtrar por posição</option>
+                    <option value="GOL">GOL</option>
+                    <option value="DEF">DEF</option>
+                    <option value="MEI">MEI</option>
+                    <option value="ATA">ATA</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="id_jogadores_banco">Selecionar Jogadores para o Banco:</label>
-                <select id="id_jogadores_banco" class="form-control selectpicker" name="jogadores_banco" multiple data-live-search="true">
-                    {% for jogador in jogadores %}
-                        <option value="{{ jogador.id }}">{{ jogador.nome }} - {{ jogador.get_posicao_display }}</option>
-                    {% endfor %}
-                </select>
+                <label for="jogadores_titulares">Jogadores Titulares:</label>
+                {{ form.jogadores_titulares }}
+            </div>
+
+            <div class="form-group">
+                <label for="jogadores_banco">Jogadores Banco:</label>
+                {{ form.jogadores_banco }}
             </div>
 
             <button type="submit" class="btn btn-primary">Criar Time</button>
@@ -49,11 +51,13 @@
     </div>
 
     <style>
-        /* Estilo adicional */
         .container {
             margin-top: 30px;
         }
         h2 {
+            margin-bottom: 20px;
+        }
+        .form-group {
             margin-bottom: 20px;
         }
         .btn {
@@ -61,13 +65,39 @@
         }
     </style>
 
-    <!-- Adiciona o Bootstrap Select para múltipla escolha e busca -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.js"></script>
-
     <script>
-        $(document).ready(function() {
-            $('.selectpicker').selectpicker();
+        // Filtragem por nome
+        document.getElementById('pesquisaNome').addEventListener('input', function () {
+            const valorPesquisa = this.value.toLowerCase();
+            const opcoesTitulares = document.querySelectorAll('#id_jogadores_titulares option');
+            const opcoesBanco = document.querySelectorAll('#id_jogadores_banco option');
+
+            opcoesTitulares.forEach(opcao => {
+                const texto = opcao.textContent.toLowerCase();
+                opcao.style.display = texto.includes(valorPesquisa) ? '' : 'none';
+            });
+
+            opcoesBanco.forEach(opcao => {
+                const texto = opcao.textContent.toLowerCase();
+                opcao.style.display = texto.includes(valorPesquisa) ? '' : 'none';
+            });
+        });
+
+        // Filtragem por posição
+        document.getElementById('pesquisaPosicao').addEventListener('change', function () {
+            const valorPosicao = this.value;
+            const opcoesTitulares = document.querySelectorAll('#id_jogadores_titulares option');
+            const opcoesBanco = document.querySelectorAll('#id_jogadores_banco option');
+
+            opcoesTitulares.forEach(opcao => {
+                const texto = opcao.getAttribute('data-posicao');
+                opcao.style.display = texto === valorPosicao || !valorPosicao ? '' : 'none';
+            });
+
+            opcoesBanco.forEach(opcao => {
+                const texto = opcao.getAttribute('data-posicao');
+                opcao.style.display = texto === valorPosicao || !valorPosicao ? '' : 'none';
+            });
         });
     </script>
 {% endblock %}

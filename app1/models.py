@@ -41,7 +41,7 @@ class Jogador(models.Model):
         self.total_gols += 1  # Incrementa os gols totais do jogador
 
     def __str__(self):
-        return f'{self.nome} - Camisa {self.numero_camisa}'
+        return f'{self.nome} ({self.numero_camisa}  {self.posicao})'
 
 
 
