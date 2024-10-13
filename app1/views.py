@@ -66,6 +66,8 @@ def criar_time(request):
 
 
 
+
+
 def selecionar_partida(request):
     times = Time.objects.all()
     competicoes = Competicao.objects.all()
@@ -322,22 +324,24 @@ def remover_gol(request, jogador_id, partida_id, tipo_gol):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-def time_detail(request, time_id):
-    # Recupera o time com o ID especificado ou retorna 404 se não encontrado
+def detalhes_time(request, time_id):
     time = get_object_or_404(Time, id=time_id)
+    
+    # Fetch only finalized matches for this team
+    partidas_finalizadas = Partida.objects.filter(
+        (Q(time_casa=time) | Q(time_visitante=time)) & Q(status='FINALIZADA')
+    )
 
-    # Recupera os jogadores titulares e do banco associados ao time
+    # Fetch starting players (titulares)
     jogadores_titulares = time.jogadores_titulares.all()
-    jogadores_banco = time.jogadores_banco.all()
 
-    # Contexto para ser passado ao template
     context = {
         'time': time,
+        'partidas_finalizadas': partidas_finalizadas,
         'jogadores_titulares': jogadores_titulares,
-        'jogadores_banco': jogadores_banco,
     }
 
-    return render(request, 'time/time_detail.html', context)
+    return render(request, 'detalhes_time.html', context)
 
 
 
