@@ -19,3 +19,16 @@ class TimeForm(forms.ModelForm):
         label="Jogadores Banco",
         required=False
     )
+
+
+
+class JogadorForm(forms.ModelForm):
+    class Meta:
+        model = Jogador
+        fields = ['nome', 'numero_camisa', 'posicao']
+
+        widgets = {
+            'nome': forms.TextInput(attrs={'class': 'form-control'}),
+            'numero_camisa': forms.NumberInput(attrs={'class': 'form-control'}),
+            'posicao': forms.Select(attrs={'class': 'form-control'}),
+        }
