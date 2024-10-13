@@ -7,6 +7,9 @@ from django.http import JsonResponse
 import json
 from django.views.decorators.http import require_http_methods
 from .forms import *
+from django.contrib import messages
+
+
 
 def home(request):
     # Contar corretamente as partidas finalizadas para cada time e somar os jogadores titulares e do banco
@@ -342,6 +345,43 @@ def detalhes_time(request, time_id):
     }
 
     return render(request, 'detalhes_time.html', context)
+
+
+
+def adicionar_jogador(request, time_id):
+    time = get_object_or_404(Time, id=time_id)
+    
+    if request.method == 'POST':
+        jogador_existente_id = request.POST.get('jogador_existente')
+        
+        # Se um jogador existente for selecionado
+        if jogador_existente_id:
+            jogador_existente = get_object_or_404(Jogador, id=jogador_existente_id)
+            time.jogadores_titulares.add(jogador_existente)  # Adiciona aos titulares
+            messages.success(request, f'{jogador_existente.nome} foi adicionado ao time {time.nome}.')
+            return redirect('detalhes_time', time_id=time_id)
+
+        # Se criar novo jogador
+        form = JogadorForm(request.POST)
+        if form.is_valid():
+            novo_jogador = form.save(commit=False)
+            novo_jogador.time = time
+            novo_jogador.save()
+            time.jogadores_titulares.add(novo_jogador)  # Adiciona aos titulares
+            messages.success(request, f'{novo_jogador.nome} foi adicionado ao time {time.nome}.')
+            return redirect('detalhes_time', time_id=time_id)
+
+    else:
+        form = JogadorForm()
+        jogadores_existentes = Jogador.objects.exclude(time=time)  # Filtra jogadores fora do time
+
+    context = {
+        'time': time,
+        'form': form,
+        'jogadores_existentes': jogadores_existentes
+    }
+
+    return render(request, 'adicionar_jogador.html', context)
 
 
 
