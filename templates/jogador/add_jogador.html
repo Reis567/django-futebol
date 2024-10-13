@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h2>Adicionar Jogador ao Time: {{ time.nome }}</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <!-- Seleção de Jogador Existente -->
+        <div class="form-group">
+            <label for="jogador_existente">Selecionar Jogador Existente:</label>
+            <select id="jogador_existente" name="jogador_existente" class="form-control">
+                <option value="">-- Selecione um jogador --</option>
+                {% for jogador in jogadores_existentes %}
+                    <option value="{{ jogador.id }}">{{ jogador.nome }} ({{ jogador.posicao }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <hr>
+
+        <!-- Formulário para Adicionar Novo Jogador -->
+        <h3>Ou Adicionar Novo Jogador:</h3>
+        <div class="form-group">
+            <label for="nome">Nome:</label>
+            {{ form.nome }}
+        </div>
+
+        <div class="form-group">
+            <label for="numero_camisa">Número da Camisa:</label>
+            {{ form.numero_camisa }}
+        </div>
+
+        <div class="form-group">
+            <label for="posicao">Posição:</label>
+            {{ form.posicao }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Adicionar Jogador</button>
+        <a href="{% url 'detalhes_time' time.id %}" class="btn btn-secondary">Voltar</a>
+    </form>
+</div>
+
+<style>
+    .container {
+        margin-top: 30px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
