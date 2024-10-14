@@ -326,7 +326,6 @@ def remover_gol(request, jogador_id, partida_id, tipo_gol):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-
 def detalhes_time(request, time_id):
     time = get_object_or_404(Time, id=time_id)
     
@@ -342,6 +341,9 @@ def detalhes_time(request, time_id):
     # Obter jogadores titulares e ordená-los
     jogadores_titulares = list(time.jogadores_titulares.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada'))
 
+    # Obter jogadores do banco e ordená-los
+    jogadores_banco = list(time.jogadores_banco.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada'))
+
     # Buscar apenas partidas finalizadas do time
     partidas_finalizadas = Partida.objects.filter(
         Q(time_casa=time) | Q(time_visitante=time),
@@ -352,6 +354,7 @@ def detalhes_time(request, time_id):
         'time': time,
         'partidas_finalizadas': partidas_finalizadas,
         'jogadores_titulares': jogadores_titulares,
+        'jogadores_banco': jogadores_banco,  # Adicionando jogadores do banco ao contexto
     }
 
     return render(request, 'time/time_detail.html', context)

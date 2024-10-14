@@ -3,46 +3,65 @@
 
 {% block content %}
 <div class="container">
-    <h2>Detalhes do Time: {{ time.nome }}</h2>
-    
-    <div class="team-info">
-        <p><strong>Sigla:</strong> {{ time.sigla }}</p>
-        <p><strong>Técnico:</strong> {{ time.tecnico }}</p>
+    <div class="header-section">
+        <h2>{{ time.nome }}</h2>
+        <a href="{% url 'adicionar_jogador' time.id %}" class="btn btn-success">Adicionar Jogador</a>
     </div>
 
-    <!-- Campo de Futebol -->
-    <div class="soccer-field">
-        <div class="field-section" id="goleiro">
-            <h3>Goleiro</h3>
-            {% for jogador in jogadores_titulares %}
-                {% if jogador.posicao == 'GOL' %}
-                    <span>{{ jogador.nome }} ({{ jogador.numero_camisa }})</span>
-                {% endif %}
-            {% endfor %}
+    <div class="row">
+        <!-- Coluna do Campo de Futebol -->
+        <div class="col-md-8">
+            <div class="soccer-field">
+                <!-- Goleiro -->
+                <div class="goleiro">
+                    {% for jogador in jogadores_titulares %}
+                        {% if jogador.posicao == 'GOL' %}
+                            <span class="jogador">{{ jogador.nome }} ({{ jogador.numero_camisa }})</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Defensores -->
+                <div class="defensores">
+                    {% for jogador in jogadores_titulares %}
+                        {% if jogador.posicao == 'DEF' %}
+                            <span class="jogador">{{ jogador.nome }} ({{ jogador.numero_camisa }})</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Meio-campo -->
+                <div class="meio-campo">
+                    {% for jogador in jogadores_titulares %}
+                        {% if jogador.posicao == 'MEI' %}
+                            <span class="jogador">{{ jogador.nome }} ({{ jogador.numero_camisa }})</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Atacantes -->
+                <div class="atacantes">
+                    {% for jogador in jogadores_titulares %}
+                        {% if jogador.posicao == 'ATA' %}
+                            <span class="jogador">{{ jogador.nome }} ({{ jogador.numero_camisa }})</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
         </div>
-        <div class="field-section" id="defensores">
-            <h3>Defensores</h3>
-            {% for jogador in jogadores_titulares %}
-                {% if jogador.posicao == 'DEF' %}
-                    <span>{{ jogador.nome }} ({{ jogador.numero_camisa }})</span>
-                {% endif %}
-            {% endfor %}
-        </div>
-        <div class="field-section" id="meio-campo">
-            <h3>Meio-campo</h3>
-            {% for jogador in jogadores_titulares %}
-                {% if jogador.posicao == 'MEI' %}
-                    <span>{{ jogador.nome }} ({{ jogador.numero_camisa }})</span>
-                {% endif %}
-            {% endfor %}
-        </div>
-        <div class="field-section" id="atacantes">
-            <h3>Atacantes</h3>
-            {% for jogador in jogadores_titulares %}
-                {% if jogador.posicao == 'ATA' %}
-                    <span>{{ jogador.nome }} ({{ jogador.numero_camisa }})</span>
-                {% endif %}
-            {% endfor %}
+
+        <!-- Coluna dos Jogadores do Banco -->
+        <div class="col-md-4">
+            <h4>Jogadores no Banco de Reservas</h4>
+            <ul class="list-group">
+                {% for jogador in jogadores_banco %}
+                    <li class="list-group-item">
+                        {{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">Nenhum jogador no banco de reservas.</li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
 
@@ -77,21 +96,83 @@
 </div>
 
 <style>
-    .soccer-field {
-        background-color: #33aa33;
-        position: relative;
-        height: 300px;
-        margin: 20px 0;
-        border: 2px solid #000;
-    }
-    .field-section {
-        color: white;
-        font-weight: bold;
+    /* Estilo da seção de cabeçalho */
+    .header-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         margin-bottom: 20px;
     }
-    .field-section h3 {
+
+    .header-section h2 {
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+    .btn-success {
+        font-size: 16px;
+        padding: 10px 15px;
+    }
+
+    /* Estilo do campo de futebol */
+    .soccer-field {
+        position: relative;
+        width: 600px;
+        height: 400px;
+        background-color: #006400; /* Verde escuro */
+        border: 5px solid white;
+        margin: 20px auto;
+        display: grid;
+        grid-template-rows: 1fr 1fr 1fr 1fr;
+    }
+
+    .goleiro, .defensores, .meio-campo, .atacantes {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .goleiro {
+        grid-row: 1;
+    }
+
+    .defensores {
+        grid-row: 2;
+        justify-content: space-around;
+    }
+
+    .meio-campo {
+        grid-row: 3;
+        justify-content: space-around;
+    }
+
+    .atacantes {
+        grid-row: 4;
+        justify-content: space-around;
+    }
+
+    /* Estilo dos jogadores */
+    .jogador {
+        font-size: 12px;
+        color: white;
+        background-color: #333;
+        padding: 5px;
+        border-radius: 3px;
+    }
+
+    /* Estilo da lista de jogadores do banco */
+    .list-group-item {
+        font-size: 14px;
+        background-color: #f8f9fa;
+    }
+
+    /* Estilo da tabela de jogos */
+    table.table {
+        margin-top: 20px;
+    }
+
+    .table th, .table td {
         text-align: center;
-        margin-bottom: 5px;
     }
 </style>
 {% endblock %}
