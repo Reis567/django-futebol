@@ -4,57 +4,88 @@
 {% block content %}
 <div class="container">
     <h2>Gerenciar Time: {{ time.nome }}</h2>
-
-    <form method="POST">
-        {% csrf_token %}
-        
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Jogadores Titulares</h4>
-                <select id="jogadores_titulares" name="jogadores_titulares" class="form-control" multiple size="10">
-                    {% for jogador in jogadores_titulares %}
-                        <option value="{{ jogador.id }}">{{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="col-md-6">
-                <h4>Jogadores no Banco</h4>
-                <select id="jogadores_banco" name="jogadores_banco" class="form-control" multiple size="10">
-                    {% for jogador in jogadores_banco %}
-                        <option value="{{ jogador.id }}">{{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-
-        <div class="form-group mt-4">
-            <h4>Adicionar Jogadores Disponíveis ao Time</h4>
-            <select id="jogadores_disponiveis" name="jogadores_disponiveis" class="form-control" multiple size="5">
-                {% for jogador in jogadores_disponiveis %}
-                    <option value="{{ jogador.id }}">{{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})</option>
+    
+    <div class="row">
+        <!-- Coluna dos Jogadores Titulares -->
+        <div class="col-md-6">
+            <h4>Jogadores Titulares</h4>
+            <ul id="titulares" class="list-group list-group-flush jogadores-list" ondrop="handleDrop(event)" ondragover="allowDrop(event)">
+                {% for jogador in jogadores_titulares %}
+                    <li class="list-group-item jogador-item" draggable="true" ondragstart="handleDragStart(event)" data-id="{{ jogador.id }}">
+                        {{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">Nenhum jogador titular.</li>
                 {% endfor %}
-            </select>
+            </ul>
         </div>
 
-        <button type="submit" class="btn btn-primary mt-4">Atualizar Time</button>
-        <a href="{% url 'time_detail' time.id %}" class="btn btn-secondary mt-4">Voltar</a>
-    </form>
+        <!-- Coluna dos Jogadores do Banco -->
+        <div class="col-md-6">
+            <h4>Jogadores no Banco</h4>
+            <ul id="banco" class="list-group list-group-flush jogadores-list" ondrop="handleDrop(event)" ondragover="allowDrop(event)">
+                {% for jogador in jogadores_banco %}
+                    <li class="list-group-item jogador-item" draggable="true" ondragstart="handleDragStart(event)" data-id="{{ jogador.id }}">
+                        {{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">Nenhum jogador no banco.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </div>
 
 <style>
-    .container {
-        margin-top: 30px;
+    .jogadores-list {
+        min-height: 200px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        background-color: #f8f9fa;
     }
-    .form-group {
-        margin-bottom: 20px;
-    }
-    select[multiple] {
-        height: 200px;
-        font-size: 14px;
-    }
-    .btn {
-        margin-top: 10px;
+    .jogador-item {
+        cursor: move;
+        margin-bottom: 5px;
     }
 </style>
+
+<script>
+    function handleDragStart(event) {
+        event.dataTransfer.setData('text/plain', event.target.dataset.id);
+    }
+
+    function allowDrop(event) {
+        event.preventDefault();
+    }
+
+    function handleDrop(event) {
+        event.preventDefault();
+        const jogadorId = event.dataTransfer.getData('text/plain');
+        const novaPosicao = event.target.closest('.jogadores-list').id;  // 'titulares' ou 'banco'
+        
+        // Atualizar a UI
+        const jogadorElement = document.querySelector(`[data-id="${jogadorId}"]`);
+        event.target.appendChild(jogadorElement);
+
+        // Enviar a alteração para o servidor
+        fetch(`{% url 'atualizar_jogadores' time.id %}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                'jogador_id': jogadorId,
+                'nova_posicao': novaPosicao
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+        });
+    }
+</script>
 {% endblock %}

@@ -24,6 +24,13 @@
         padding: 10px 15px;
     }
 
+    .btn-warning {
+        font-size: 16px;
+        padding: 10px 15px;
+        color: white;
+        margin-left: 10px;
+    }
+
     /* Estilo do campo de futebol */
     .soccer-field {
         position: relative;
@@ -127,7 +134,10 @@
     <!-- Cabeçalho com nome do time e botão -->
     <div class="header-section">
         <h2>{{ time.nome }}</h2>
-        <a href="{% url 'adicionar_jogador' time.id %}" class="btn btn-success">Adicionar Jogador</a>
+        <div>
+            <a href="{% url 'adicionar_jogador' time.id %}" class="btn btn-primary">Adicionar Jogador</a>
+            <a href="{% url 'gerenciar_time' time.id %}" class="btn btn-primary">Gerenciar Time</a>
+        </div>
     </div>
 
     <div class="row">

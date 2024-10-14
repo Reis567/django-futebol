@@ -11,6 +11,7 @@ urlpatterns = [
     path('criar-time/', views.criar_time, name='criar_time'),
     path('time/<int:time_id>/adicionar_jogador/', views.adicionar_jogador, name='adicionar_jogador'),
     path('time/<int:time_id>/gerenciar/', views.gerenciar_time, name='gerenciar_time'),
+    path('time/<int:time_id>/atualizar_jogadores/', views.atualizar_jogadores, name='atualizar_jogadores'),
     path('partida/<int:partida_id>/jogador/<int:jogador_id>/adicionar_cartao/', views.adicionar_cartao, name='adicionar_cartao'),
     path('partida/<int:partida_id>/jogador/<int:jogador_id>/remover_cartao/', views.remover_cartao, name='remover_cartao'),
     path('partida/<int:partida_id>/substituicao/<int:jogador_saida_id>/<int:jogador_entrada_id>/', views.adicionar_substituicao, name='adicionar_substituicao'),
