@@ -365,12 +365,16 @@ def adicionar_jogador(request, time_id):
     
     if request.method == 'POST':
         jogador_existente_id = request.POST.get('jogador_existente')
-        
+        posicao_no_time = request.POST.get('posicao_no_time')  # Titular ou Banco
+
         # Se um jogador existente for selecionado
         if jogador_existente_id:
             jogador_existente = get_object_or_404(Jogador, id=jogador_existente_id)
-            time.jogadores_titulares.add(jogador_existente)  # Adiciona aos titulares
-            messages.success(request, f'{jogador_existente.nome} foi adicionado ao time {time.nome}.')
+            if posicao_no_time == 'titular':
+                time.jogadores_titulares.add(jogador_existente)  # Adiciona aos titulares
+            else:
+                time.jogadores_banco.add(jogador_existente)  # Adiciona ao banco
+            messages.success(request, f'{jogador_existente.nome} foi adicionado ao time {time.nome} como {posicao_no_time}.')
             return redirect('detalhes_time', time_id=time_id)
 
         # Se criar novo jogador
@@ -379,8 +383,11 @@ def adicionar_jogador(request, time_id):
             novo_jogador = form.save(commit=False)
             novo_jogador.time = time
             novo_jogador.save()
-            time.jogadores_titulares.add(novo_jogador)  # Adiciona aos titulares
-            messages.success(request, f'{novo_jogador.nome} foi adicionado ao time {time.nome}.')
+            if posicao_no_time == 'titular':
+                time.jogadores_titulares.add(novo_jogador)  # Adiciona aos titulares
+            else:
+                time.jogadores_banco.add(novo_jogador)  # Adiciona ao banco
+            messages.success(request, f'{novo_jogador.nome} foi adicionado ao time {time.nome} como {posicao_no_time}.')
             return redirect('detalhes_time', time_id=time_id)
 
     else:
@@ -394,6 +401,7 @@ def adicionar_jogador(request, time_id):
     }
 
     return render(request, 'jogador/add_jogador.html', context)
+
 
 
 

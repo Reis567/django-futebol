@@ -19,6 +19,15 @@
             </select>
         </div>
 
+        <!-- Seleção de posição no time (titular ou banco) -->
+        <div class="form-group">
+            <label for="posicao_no_time">Posição no Time:</label>
+            <select id="posicao_no_time" name="posicao_no_time" class="form-control">
+                <option value="titular">Titular</option>
+                <option value="banco">Banco de Reservas</option>
+            </select>
+        </div>
+
         <hr>
 
         <!-- Formulário para Adicionar Novo Jogador -->
@@ -38,6 +47,14 @@
             {{ form.posicao }}
         </div>
 
+        <div class="form-group">
+            <label for="posicao_no_time">Posição no Time:</label>
+            <select id="posicao_no_time_novo" name="posicao_no_time" class="form-control">
+                <option value="titular">Titular</option>
+                <option value="banco">Banco de Reservas</option>
+            </select>
+        </div>
+
         <button type="submit" class="btn btn-primary">Adicionar Jogador</button>
         <a href="{% url 'time_detail' time.id %}" class="btn btn-secondary">Voltar</a>
     </form>
@@ -49,6 +66,9 @@
     }
     .form-group {
         margin-bottom: 20px;
+    }
+    .btn {
+        margin-top: 10px;
     }
 </style>
 {% endblock %}
