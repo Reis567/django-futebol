@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h2>Gerenciar Time: {{ time.nome }}</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Jogadores Titulares</h4>
+                <select id="jogadores_titulares" name="jogadores_titulares" class="form-control" multiple size="10">
+                    {% for jogador in jogadores_titulares %}
+                        <option value="{{ jogador.id }}">{{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <h4>Jogadores no Banco</h4>
+                <select id="jogadores_banco" name="jogadores_banco" class="form-control" multiple size="10">
+                    {% for jogador in jogadores_banco %}
+                        <option value="{{ jogador.id }}">{{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group mt-4">
+            <h4>Adicionar Jogadores Disponíveis ao Time</h4>
+            <select id="jogadores_disponiveis" name="jogadores_disponiveis" class="form-control" multiple size="5">
+                {% for jogador in jogadores_disponiveis %}
+                    <option value="{{ jogador.id }}">{{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-4">Atualizar Time</button>
+        <a href="{% url 'time_detail' time.id %}" class="btn btn-secondary mt-4">Voltar</a>
+    </form>
+</div>
+
+<style>
+    .container {
+        margin-top: 30px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    select[multiple] {
+        height: 200px;
+        font-size: 14px;
+    }
+    .btn {
+        margin-top: 10px;
+    }
+</style>
+{% endblock %}
