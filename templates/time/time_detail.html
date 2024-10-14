@@ -2,7 +2,129 @@
 {% load static %}
 
 {% block content %}
+<style>
+    /* Estilo da seção de cabeçalho */
+    .header-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 10px;
+    }
+
+    .header-section h2 {
+        font-size: 36px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .btn-success {
+        font-size: 16px;
+        padding: 10px 15px;
+    }
+
+    /* Estilo do campo de futebol */
+    .soccer-field {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        height: 400px;
+        background-color: #2c5f2d; /* Verde escuro */
+        border: 5px solid white;
+        border-radius: 10px;
+        margin: 20px auto;
+        display: grid;
+        grid-template-rows: 1fr 1fr 1fr 1fr;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    .goleiro, .defensores, .meio-campo, .atacantes {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .goleiro {
+        grid-row: 1;
+    }
+
+    .defensores {
+        grid-row: 2;
+        justify-content: space-around;
+    }
+
+    .meio-campo {
+        grid-row: 3;
+        justify-content: space-around;
+    }
+
+    .atacantes {
+        grid-row: 4;
+        justify-content: space-around;
+    }
+
+    /* Estilo dos jogadores */
+    .jogador {
+        font-size: 14px;
+        color: white;
+        background-color: #1f3a1d;
+        padding: 8px;
+        border-radius: 6px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        font-weight: bold;
+    }
+
+    /* Estilo da lista de jogadores do banco */
+    .bench-container {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .list-group-item {
+        font-size: 14px;
+        background-color: #f8f9fa;
+        border: 1px solid #ccc;
+        margin-bottom: 5px;
+        padding: 10px;
+        border-radius: 5px;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    .list-group-item:hover {
+        background-color: #e9ecef;
+    }
+
+    /* Estilo da tabela de jogos */
+    table.table {
+
+        width: 100%;
+
+
+    }
+
+    .table th, .table td {
+        text-align: center;
+        padding: 15px;
+
+    }
+
+    .table th {
+
+        font-size: 16px;
+    }
+
+    .table td {
+        font-size: 14px;
+    }
+
+
+</style>
+
 <div class="container">
+    <!-- Cabeçalho com nome do time e botão -->
     <div class="header-section">
         <h2>{{ time.nome }}</h2>
         <a href="{% url 'adicionar_jogador' time.id %}" class="btn btn-success">Adicionar Jogador</a>
@@ -52,22 +174,24 @@
 
         <!-- Coluna dos Jogadores do Banco -->
         <div class="col-md-4">
-            <h4>Jogadores no Banco de Reservas</h4>
-            <ul class="list-group">
-                {% for jogador in jogadores_banco %}
-                    <li class="list-group-item">
-                        {{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})
-                    </li>
-                {% empty %}
-                    <li class="list-group-item">Nenhum jogador no banco de reservas.</li>
-                {% endfor %}
-            </ul>
+            <div class="bench-container">
+                <h4>Jogadores no Banco de Reservas</h4>
+                <ul class="list-group">
+                    {% for jogador in jogadores_banco %}
+                        <li class="list-group-item">
+                            {{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item">Nenhum jogador no banco de reservas.</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </div>
 
     <!-- Lista de Jogos -->
     <h3>Partidas Finalizadas</h3>
-    <table class="table">
+    <table class="table" id="timesTable">
         <thead>
             <tr>
                 <th>Time Casa</th>
@@ -94,85 +218,4 @@
         </tbody>
     </table>
 </div>
-
-<style>
-    /* Estilo da seção de cabeçalho */
-    .header-section {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-    }
-
-    .header-section h2 {
-        font-size: 32px;
-        font-weight: bold;
-    }
-
-    .btn-success {
-        font-size: 16px;
-        padding: 10px 15px;
-    }
-
-    /* Estilo do campo de futebol */
-    .soccer-field {
-        position: relative;
-        width: 600px;
-        height: 400px;
-        background-color: #006400; /* Verde escuro */
-        border: 5px solid white;
-        margin: 20px auto;
-        display: grid;
-        grid-template-rows: 1fr 1fr 1fr 1fr;
-    }
-
-    .goleiro, .defensores, .meio-campo, .atacantes {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .goleiro {
-        grid-row: 1;
-    }
-
-    .defensores {
-        grid-row: 2;
-        justify-content: space-around;
-    }
-
-    .meio-campo {
-        grid-row: 3;
-        justify-content: space-around;
-    }
-
-    .atacantes {
-        grid-row: 4;
-        justify-content: space-around;
-    }
-
-    /* Estilo dos jogadores */
-    .jogador {
-        font-size: 12px;
-        color: white;
-        background-color: #333;
-        padding: 5px;
-        border-radius: 3px;
-    }
-
-    /* Estilo da lista de jogadores do banco */
-    .list-group-item {
-        font-size: 14px;
-        background-color: #f8f9fa;
-    }
-
-    /* Estilo da tabela de jogos */
-    table.table {
-        margin-top: 20px;
-    }
-
-    .table th, .table td {
-        text-align: center;
-    }
-</style>
 {% endblock %}

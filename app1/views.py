@@ -393,7 +393,7 @@ def adicionar_jogador(request, time_id):
         'jogadores_existentes': jogadores_existentes
     }
 
-    return render(request, 'adicionar_jogador.html', context)
+    return render(request, 'jogador/add_jogador.html', context)
 
 
 
