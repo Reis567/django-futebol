@@ -405,6 +405,47 @@ def adicionar_jogador(request, time_id):
 
 
 
+def gerenciar_time(request, time_id):
+    time = get_object_or_404(Time, id=time_id)
+
+    if request.method == 'POST':
+        # Jogadores que estão sendo movidos para titulares
+        jogadores_para_titulares = request.POST.getlist('jogadores_titulares')
+
+        # Jogadores que estão sendo movidos para o banco
+        jogadores_para_banco = request.POST.getlist('jogadores_banco')
+
+        # Limpar os grupos atuais de titulares e banco
+        time.jogadores_titulares.clear()
+        time.jogadores_banco.clear()
+
+        # Adicionar os novos jogadores aos titulares e banco
+        time.jogadores_titulares.add(*jogadores_para_titulares)
+        time.jogadores_banco.add(*jogadores_para_banco)
+
+        messages.success(request, 'Jogadores atualizados com sucesso!')
+        return redirect('gerenciar_time', time_id=time_id)
+
+    # Listar todos os jogadores do time
+    jogadores_titulares = time.jogadores_titulares.all()
+    jogadores_banco = time.jogadores_banco.all()
+    jogadores_disponiveis = Jogador.objects.filter(time=time).exclude(id__in=jogadores_titulares).exclude(id__in=jogadores_banco)
+
+    context = {
+        'time': time,
+        'jogadores_titulares': jogadores_titulares,
+        'jogadores_banco': jogadores_banco,
+        'jogadores_disponiveis': jogadores_disponiveis,
+    }
+    return render(request, 'time/gerenciar_time.html', context)
+
+
+
+
+
+
+
+
 @require_http_methods(["POST"])
 def adicionar_cartao(request, jogador_id, partida_id):
     jogador = get_object_or_404(Jogador, id=jogador_id)
