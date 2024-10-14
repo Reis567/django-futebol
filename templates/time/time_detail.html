@@ -12,25 +12,35 @@
 
     <!-- Campo de Futebol -->
     <div class="soccer-field">
-        <div class="field-section" id="goleiro">{{ jogadores_titulares|filter: "posicao=GOL" }}</div>
+        <div class="field-section" id="goleiro">
+            <h3>Goleiro</h3>
+            {% for jogador in jogadores_titulares %}
+                {% if jogador.posicao == 'GOL' %}
+                    <span>{{ jogador.nome }} ({{ jogador.numero_camisa }})</span>
+                {% endif %}
+            {% endfor %}
+        </div>
         <div class="field-section" id="defensores">
+            <h3>Defensores</h3>
             {% for jogador in jogadores_titulares %}
                 {% if jogador.posicao == 'DEF' %}
-                    <span>{{ jogador.nome }}</span>
+                    <span>{{ jogador.nome }} ({{ jogador.numero_camisa }})</span>
                 {% endif %}
             {% endfor %}
         </div>
         <div class="field-section" id="meio-campo">
+            <h3>Meio-campo</h3>
             {% for jogador in jogadores_titulares %}
                 {% if jogador.posicao == 'MEI' %}
-                    <span>{{ jogador.nome }}</span>
+                    <span>{{ jogador.nome }} ({{ jogador.numero_camisa }})</span>
                 {% endif %}
             {% endfor %}
         </div>
         <div class="field-section" id="atacantes">
+            <h3>Atacantes</h3>
             {% for jogador in jogadores_titulares %}
                 {% if jogador.posicao == 'ATA' %}
-                    <span>{{ jogador.nome }}</span>
+                    <span>{{ jogador.nome }} ({{ jogador.numero_camisa }})</span>
                 {% endif %}
             {% endfor %}
         </div>
@@ -75,29 +85,13 @@
         border: 2px solid #000;
     }
     .field-section {
-        position: absolute;
         color: white;
         font-weight: bold;
+        margin-bottom: 20px;
     }
-    #goleiro {
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    #defensores {
-        top: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    #meio-campo {
-        top: 150px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    #atacantes {
-        top: 220px;
-        left: 50%;
-        transform: translateX(-50%);
+    .field-section h3 {
+        text-align: center;
+        margin-bottom: 5px;
     }
 </style>
 {% endblock %}

@@ -330,13 +330,23 @@ def remover_gol(request, jogador_id, partida_id, tipo_gol):
 def detalhes_time(request, time_id):
     time = get_object_or_404(Time, id=time_id)
     
-    # Fetch only finalized matches for this team
-    partidas_finalizadas = Partida.objects.filter(
-        (Q(time_casa=time) | Q(time_visitante=time)) & Q(status='FINALIZADA')
+    # Ordenar jogadores titulares por posição
+    ordem_posicao = Case(
+        When(posicao='GOL', then=1),
+        When(posicao='DEF', then=2),
+        When(posicao='MEI', then=3),
+        When(posicao='ATA', then=4),
+        output_field=IntegerField()
     )
 
-    # Fetch starting players (titulares)
-    jogadores_titulares = time.jogadores_titulares.all()
+    # Obter jogadores titulares e ordená-los
+    jogadores_titulares = list(time.jogadores_titulares.annotate(posicao_ordenada=ordem_posicao).order_by('posicao_ordenada'))
+
+    # Buscar apenas partidas finalizadas do time
+    partidas_finalizadas = Partida.objects.filter(
+        Q(time_casa=time) | Q(time_visitante=time),
+        status='FINALIZADA'
+    )
 
     context = {
         'time': time,
@@ -344,8 +354,7 @@ def detalhes_time(request, time_id):
         'jogadores_titulares': jogadores_titulares,
     }
 
-    return render(request, 'detalhes_time.html', context)
-
+    return render(request, 'time/time_detail.html', context)
 
 
 def adicionar_jogador(request, time_id):

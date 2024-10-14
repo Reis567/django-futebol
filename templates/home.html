@@ -25,10 +25,18 @@
                 <tbody>
                     {% for partida in partidas %}
                         <tr>
-                            <td>{{ partida.time_casa.nome }}</td>
+                            <td>
+                                <a href="{% url 'time_detail' partida.time_casa.id %}">
+                                    {{ partida.time_casa.nome }}
+                                </a>
+                            </td>
                             <td>{{ partida.placar_casa }}</td>
                             <td>{{ partida.placar_visitante }}</td>
-                            <td>{{ partida.time_visitante.nome }}</td>
+                            <td>
+                                <a href="{% url 'time_detail' partida.time_visitante.id %}">
+                                    {{ partida.time_visitante.nome }}
+                                </a>
+                            </td>
                             <td>{{ partida.competicao.nome }}</td>
                         </tr>
                     {% empty %}
@@ -55,7 +63,11 @@
                 <tbody>
                     {% for time in times %}
                         <tr>
-                            <td>{{ time.nome }}</td>
+                            <td>
+                                <a href="{% url 'time_detail' time.id %}">
+                                    {{ time.nome }}
+                                </a>
+                            </td>
                             <td>{{ time.total_jogadores }}</td>
                             <td>{{ time.total_partidas }}</td>
                         </tr>
