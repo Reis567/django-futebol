@@ -3,12 +3,15 @@
 
 {% block content %}
 <div class="container">
-    <h2>Gerenciar Time: {{ time.nome }}</h2>
+    <!-- Nome do time com destaque -->
+    <div class="text-center mb-4">
+        <h1 class="display-4 font-weight-bold">{{ time.nome }}</h1>
+    </div>
     
     <div class="row">
         <!-- Coluna dos Jogadores Titulares -->
-        <div class="col-md-6">
-            <h4>Jogadores Titulares</h4>
+        <div class="col-md-6 text-center">
+            <h3 class="font-weight-bold mb-4">Jogadores Titulares</h3>
             <ul id="titulares" class="list-group list-group-flush jogadores-list" ondrop="handleDrop(event)" ondragover="allowDrop(event)">
                 {% for jogador in jogadores_titulares %}
                     <li class="list-group-item jogador-item" draggable="true" ondragstart="handleDragStart(event)" data-id="{{ jogador.id }}">
@@ -21,8 +24,8 @@
         </div>
 
         <!-- Coluna dos Jogadores do Banco -->
-        <div class="col-md-6">
-            <h4>Jogadores no Banco</h4>
+        <div class="col-md-6 text-center">
+            <h3 class="font-weight-bold mb-4">Jogadores no Banco</h3>
             <ul id="banco" class="list-group list-group-flush jogadores-list" ondrop="handleDrop(event)" ondragover="allowDrop(event)">
                 {% for jogador in jogadores_banco %}
                     <li class="list-group-item jogador-item" draggable="true" ondragstart="handleDragStart(event)" data-id="{{ jogador.id }}">
@@ -37,15 +40,40 @@
 </div>
 
 <style>
-    .jogadores-list {
-        min-height: 200px;
-        border: 1px solid #ccc;
-        padding: 10px;
-        background-color: #f8f9fa;
+    /* Estilo da área de gerenciamento do time */
+    .container {
+        margin-top: 30px;
     }
+    
+    .display-4 {
+        font-size: 4rem;
+/* Cor mais escura para o nome do time */
+    }
+
+    .font-weight-bold {
+        font-weight: bold;
+    }
+
+    /* Estilo das listas de jogadores */
+    .jogadores-list {
+        min-height: 250px;
+        border: 2px solid ; /* Borda azul */
+        padding: 15px;
+        background-color: #f1f1f1;
+    }
+    
     .jogador-item {
         cursor: move;
-        margin-bottom: 5px;
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-weight: 500;
+        background-color: #e9ecef;
+        border: 1px solid ;
+    }
+
+    /* Centralizar os títulos das seções de jogadores */
+    h3 {
+        text-transform: uppercase;
     }
 </style>
 
@@ -76,7 +104,7 @@
             },
             body: new URLSearchParams({
                 'jogador_id': jogadorId,
-                'nova_posicao': novaPosicao
+                'nova_posicao': nova_posicao
             })
         })
         .then(response => response.json())
