@@ -442,6 +442,22 @@ def atualizar_jogadores(request, time_id):
 
 
 
+def remover_jogador(request, time_id):
+    if request.method == 'POST':
+        time = get_object_or_404(Time, id=time_id)
+        jogador_id = request.POST.get('jogador_id')
+        jogador = get_object_or_404(Jogador, id=jogador_id)
+
+        # Remover jogador do time
+        if jogador in time.jogadores_titulares.all():
+            time.jogadores_titulares.remove(jogador)
+        elif jogador in time.jogadores_banco.all():
+            time.jogadores_banco.remove(jogador)
+
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})
+
+
 
 
 

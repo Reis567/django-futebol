@@ -16,6 +16,7 @@
                 {% for jogador in jogadores_titulares %}
                     <li class="list-group-item jogador-item" draggable="true" ondragstart="handleDragStart(event)" data-id="{{ jogador.id }}">
                         {{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})
+                        <button class="btn btn-danger btn-sm remove-jogador" data-id="{{ jogador.id }}">X</button>
                     </li>
                 {% empty %}
                     <li class="list-group-item">Nenhum jogador titular.</li>
@@ -30,6 +31,7 @@
                 {% for jogador in jogadores_banco %}
                     <li class="list-group-item jogador-item" draggable="true" ondragstart="handleDragStart(event)" data-id="{{ jogador.id }}">
                         {{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})
+                        <button class="btn btn-danger btn-sm remove-jogador" data-id="{{ jogador.id }}">X</button>
                     </li>
                 {% empty %}
                     <li class="list-group-item">Nenhum jogador no banco.</li>
@@ -39,45 +41,54 @@
     </div>
 </div>
 
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmação de Exclusão</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="fecharModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir este jogador do time?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="fecharModal()">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteButton">Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
-    /* Estilo da área de gerenciamento do time */
-    .container {
-        margin-top: 30px;
-    }
-    
-    .display-4 {
-        font-size: 4rem;
-/* Cor mais escura para o nome do time */
-    }
-
-    .font-weight-bold {
-        font-weight: bold;
-    }
-
-    /* Estilo das listas de jogadores */
     .jogadores-list {
-        min-height: 250px;
-        border: 2px solid ; /* Borda azul */
-        padding: 15px;
-        background-color: #f1f1f1;
+        min-height: 200px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        background-color: #f8f9fa;
     }
-    
     .jogador-item {
         cursor: move;
-        margin-bottom: 10px;
-        font-size: 16px;
-        font-weight: 500;
-        background-color: #e9ecef;
-        border: 1px solid ;
+        margin-bottom: 5px;
+        position: relative;
     }
-
-    /* Centralizar os títulos das seções de jogadores */
-    h3 {
-        text-transform: uppercase;
+    .remove-jogador {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: red;
+        color: white;
+        border: none;
+        cursor: pointer;
     }
 </style>
 
 <script>
+    let jogadorParaExcluir = null;
+
     function handleDragStart(event) {
         event.dataTransfer.setData('text/plain', event.target.dataset.id);
     }
@@ -104,7 +115,7 @@
             },
             body: new URLSearchParams({
                 'jogador_id': jogadorId,
-                'nova_posicao': nova_posicao
+                'nova_posicao': novaPosicao
             })
         })
         .then(response => response.json())
@@ -114,6 +125,43 @@
         .catch(error => {
             console.error('Erro:', error);
         });
+    }
+
+    document.querySelectorAll('.remove-jogador').forEach(button => {
+        button.addEventListener('click', function() {
+            jogadorParaExcluir = this.dataset.id;
+            $('#confirmDeleteModal').modal('show');
+        });
+    });
+
+    document.getElementById('confirmDeleteButton').addEventListener('click', function() {
+        if (jogadorParaExcluir) {
+            fetch(`{% url 'remover_jogador' time.id %}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    'jogador_id': jogadorParaExcluir
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelector(`[data-id="${jogadorParaExcluir}"]`).remove();
+                    fecharModal();
+                    jogadorParaExcluir = null;
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+            });
+        }
+    });
+
+    function fecharModal() {
+        $('#confirmDeleteModal').modal('hide');
     }
 </script>
 {% endblock %}
