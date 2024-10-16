@@ -3,10 +3,11 @@
 
 {% block content %}
 <div class="container">
-    <!-- Nome do time com destaque -->
-    <div class="text-center mb-4">
-        <h1 class="display-4 font-weight-bold">{{ time.nome }}</h1>
-        <a href="{% url 'adicionar_jogador' time.id %}" class="btn btn-primary mt-4">Adicionar Jogador</a>
+    <!-- Nome do time com destaque e botões alinhados -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="javascript:history.back()" class="btn btn-secondary">Voltar</a>
+        <h1 class="font-weight-bolder text-center flex-grow-1 nome-time">{{ time.nome }}</h1>
+        <a href="{% url 'adicionar_jogador' time.id %}" class="btn btn-primary">Adicionar Jogador</a>
     </div>
     
     <div class="row">
@@ -84,6 +85,22 @@
         color: white;
         border: none;
         cursor: pointer;
+    }
+    .d-flex {
+        display: flex;
+    }
+    .justify-content-between {
+        justify-content: space-between;
+    }
+    .align-items-center {
+        align-items: center;
+    }
+    .flex-grow-1 {
+        flex-grow: 1;
+    }
+    .nome-time{
+        font-weight: bolder !important;
+        font-size: 54px;
     }
 </style>
 
