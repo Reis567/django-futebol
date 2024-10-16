@@ -375,7 +375,7 @@ def adicionar_jogador(request, time_id):
             else:
                 time.jogadores_banco.add(jogador_existente)  # Adiciona ao banco
             messages.success(request, f'{jogador_existente.nome} foi adicionado ao time {time.nome} como {posicao_no_time}.')
-            return redirect('detalhes_time', time_id=time_id)
+            return redirect('time_detail', time_id=time_id)
 
         # Se criar novo jogador
         form = JogadorForm(request.POST)
@@ -388,7 +388,7 @@ def adicionar_jogador(request, time_id):
             else:
                 time.jogadores_banco.add(novo_jogador)  # Adiciona ao banco
             messages.success(request, f'{novo_jogador.nome} foi adicionado ao time {time.nome} como {posicao_no_time}.')
-            return redirect('detalhes_time', time_id=time_id)
+            return redirect('time_detail', time_id=time_id)
 
     else:
         form = JogadorForm()

@@ -6,6 +6,7 @@
     <!-- Nome do time com destaque -->
     <div class="text-center mb-4">
         <h1 class="display-4 font-weight-bold">{{ time.nome }}</h1>
+        <a href="{% url 'adicionar_jogador' time.id %}" class="btn btn-primary mt-4">Adicionar Jogador</a>
     </div>
     
     <div class="row">
