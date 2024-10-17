@@ -7,18 +7,18 @@ class TimeForm(forms.ModelForm):
         model = Time
         fields = ['nome', 'sigla', 'tecnico']
 
-    # Campos para selecionar jogadores titulares e banco usando Select com filtro
     jogadores_titulares = forms.ModelMultipleChoiceField(
         queryset=Jogador.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
+        widget=forms.CheckboxSelectMultiple,
         label="Jogadores Titulares"
     )
     jogadores_banco = forms.ModelMultipleChoiceField(
         queryset=Jogador.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
+        widget=forms.CheckboxSelectMultiple,
         label="Jogadores Banco",
         required=False
     )
+
 
 
 

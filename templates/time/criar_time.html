@@ -8,17 +8,17 @@
             {% csrf_token %}
             {{ form.non_field_errors }}
 
-            <div class="form-group">
+            <div class="form-group input-bg-white">
                 <label for="nome">Nome do Time:</label>
                 {{ form.nome }}
             </div>
 
-            <div class="form-group">
+            <div class="form-group input-bg-white">
                 <label for="sigla">Sigla do Time:</label>
                 {{ form.sigla }}
             </div>
 
-            <div class="form-group">
+            <div class="form-group input-bg-white">
                 <label for="tecnico">Nome do Técnico:</label>
                 {{ form.tecnico }}
             </div>
@@ -36,13 +36,31 @@
             </div>
 
             <div class="form-group">
-                <label for="jogadores_titulares">Jogadores Titulares:</label>
-                {{ form.jogadores_titulares }}
+                <label>Jogadores Titulares:</label>
+                <div id="titularesCheckboxes">
+                    {% for jogador in form.jogadores_titulares.field.queryset %}
+                        <div class="form-check">
+                            <input class="form-check-input titular-checkbox" type="checkbox" value="{{ jogador.id }}" id="titular_{{ jogador.id }}" data-id="{{ jogador.id }}" data-posicao="{{ jogador.posicao }}">
+                            <label class="form-check-label" for="titular_{{ jogador.id }}">
+                                {{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
 
             <div class="form-group">
-                <label for="jogadores_banco">Jogadores Banco:</label>
-                {{ form.jogadores_banco }}
+                <label>Jogadores Banco:</label>
+                <div id="bancoCheckboxes">
+                    {% for jogador in form.jogadores_banco.field.queryset %}
+                        <div class="form-check">
+                            <input class="form-check-input banco-checkbox" type="checkbox" value="{{ jogador.id }}" id="banco_{{ jogador.id }}" data-id="{{ jogador.id }}" data-posicao="{{ jogador.posicao }}">
+                            <label class="form-check-label" for="banco_{{ jogador.id }}">
+                                {{ jogador.nome }} ({{ jogador.numero_camisa }} - {{ jogador.get_posicao_display }})
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
 
             <button type="submit" class="btn btn-primary">Criar Time</button>
@@ -63,40 +81,68 @@
         .btn {
             margin-top: 10px;
         }
+        .input-bg-white input {
+            background-color: white;
+        }
     </style>
 
     <script>
         // Filtragem por nome
         document.getElementById('pesquisaNome').addEventListener('input', function () {
             const valorPesquisa = this.value.toLowerCase();
-            const opcoesTitulares = document.querySelectorAll('#id_jogadores_titulares option');
-            const opcoesBanco = document.querySelectorAll('#id_jogadores_banco option');
+            const opcoesTitulares = document.querySelectorAll('.titular-checkbox + label');
+            const opcoesBanco = document.querySelectorAll('.banco-checkbox + label');
 
             opcoesTitulares.forEach(opcao => {
                 const texto = opcao.textContent.toLowerCase();
-                opcao.style.display = texto.includes(valorPesquisa) ? '' : 'none';
+                opcao.parentElement.style.display = texto.includes(valorPesquisa) ? '' : 'none';
             });
 
             opcoesBanco.forEach(opcao => {
                 const texto = opcao.textContent.toLowerCase();
-                opcao.style.display = texto.includes(valorPesquisa) ? '' : 'none';
+                opcao.parentElement.style.display = texto.includes(valorPesquisa) ? '' : 'none';
             });
         });
 
         // Filtragem por posição
         document.getElementById('pesquisaPosicao').addEventListener('change', function () {
             const valorPosicao = this.value;
-            const opcoesTitulares = document.querySelectorAll('#id_jogadores_titulares option');
-            const opcoesBanco = document.querySelectorAll('#id_jogadores_banco option');
+            const opcoesTitulares = document.querySelectorAll('.titular-checkbox');
+            const opcoesBanco = document.querySelectorAll('.banco-checkbox');
 
             opcoesTitulares.forEach(opcao => {
                 const texto = opcao.getAttribute('data-posicao');
-                opcao.style.display = texto === valorPosicao || !valorPosicao ? '' : 'none';
+                opcao.parentElement.style.display = texto === valorPosicao || !valorPosicao ? '' : 'none';
             });
 
             opcoesBanco.forEach(opcao => {
                 const texto = opcao.getAttribute('data-posicao');
-                opcao.style.display = texto === valorPosicao || !valorPosicao ? '' : 'none';
+                opcao.parentElement.style.display = texto === valorPosicao || !valorPosicao ? '' : 'none';
+            });
+        });
+
+        // Sincronizar Titulares e Banco
+        document.querySelectorAll('.titular-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                const id = this.dataset.id;
+                const bancoCheckbox = document.querySelector(`#banco_${id}`);
+                if (this.checked) {
+                    if (bancoCheckbox) bancoCheckbox.parentElement.style.display = 'none';
+                } else {
+                    if (bancoCheckbox) bancoCheckbox.parentElement.style.display = '';
+                }
+            });
+        });
+
+        document.querySelectorAll('.banco-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                const id = this.dataset.id;
+                const titularCheckbox = document.querySelector(`#titular_${id}`);
+                if (this.checked) {
+                    if (titularCheckbox) titularCheckbox.parentElement.style.display = 'none';
+                } else {
+                    if (titularCheckbox) titularCheckbox.parentElement.style.display = '';
+                }
             });
         });
     </script>
