@@ -37,7 +37,7 @@
 
             <div class="form-group">
                 <label>Jogadores Titulares:</label>
-                <div id="titularesCheckboxes">
+                <div id="titularesCheckboxes" class="scrollable-list">
                     {% for jogador in form.jogadores_titulares.field.queryset %}
                         <div class="form-check">
                             <input class="form-check-input titular-checkbox" type="checkbox" value="{{ jogador.id }}" id="titular_{{ jogador.id }}" data-id="{{ jogador.id }}" data-posicao="{{ jogador.posicao }}">
@@ -51,7 +51,7 @@
 
             <div class="form-group">
                 <label>Jogadores Banco:</label>
-                <div id="bancoCheckboxes">
+                <div id="bancoCheckboxes" class="scrollable-list">
                     {% for jogador in form.jogadores_banco.field.queryset %}
                         <div class="form-check">
                             <input class="form-check-input banco-checkbox" type="checkbox" value="{{ jogador.id }}" id="banco_{{ jogador.id }}" data-id="{{ jogador.id }}" data-posicao="{{ jogador.posicao }}">
@@ -83,6 +83,16 @@
         }
         .input-bg-white input {
             background-color: white;
+        }
+        .scrollable-list {
+            max-height: 300px; /* Define a altura máxima para a lista */
+            overflow-y: auto;  /* Adiciona rolagem vertical */
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f8f9fa;
+        }
+        .form-check {
+            margin-bottom: 5px;
         }
     </style>
 
