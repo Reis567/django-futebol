@@ -1,36 +1,78 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>Selecione os Times e a Competição</h1>
+    <div class="container">
+        <h1 class="text-center mb-5">Selecione os Times e a Competição</h1>
 
-    <form method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="time_casa">Time Casa</label>
-            <select id="time_casa" name="time_casa" class="form-control">
-                {% for time in times %}
-                    <option value="{{ time.id }}">{{ time.nome }}</option>
-                {% endfor %}
-            </select>
-        </div>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <!-- Seleção do Time Casa -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="time_casa" class="form-label-large">Time Casa</label>
+                        <select id="time_casa" name="time_casa" class="form-control input-large">
+                            {% for time in times %}
+                                <option value="{{ time.id }}">{{ time.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
 
-        <div class="form-group">
-            <label for="time_visitante">Time Visitante</label>
-            <select id="time_visitante" name="time_visitante" class="form-control">
-                {% for time in times %}
-                    <option value="{{ time.id }}">{{ time.nome }}</option>
-                {% endfor %}
-            </select>
-        </div>
+                <!-- Seleção do Time Visitante -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="time_visitante" class="form-label-large">Time Visitante</label>
+                        <select id="time_visitante" name="time_visitante" class="form-control input-large">
+                            {% for time in times %}
+                                <option value="{{ time.id }}">{{ time.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="competicao">Competição</label>
-            <select id="competicao" name="competicao" class="form-control">
-                {% for competicao in competicoes %}
-                    <option value="{{ competicao.id }}">{{ competicao.nome }}</option>
-                {% endfor %}
-            </select>
-        </div>
+            <!-- Seleção da Competição -->
+            <div class="form-group mt-4">
+                <label for="competicao" class="form-label-large">Competição</label>
+                <select id="competicao" name="competicao" class="form-control input-large">
+                    {% for competicao in competicoes %}
+                        <option value="{{ competicao.id }}">{{ competicao.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <button type="submit" class="btn btn-primary mt-3">Iniciar Transmissão</button>
-    </form>
+            <button type="submit" class="btn btn-primary mt-4 btn-lg w-100">Iniciar Transmissão</button>
+        </form>
+    </div>
+
+    <style>
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label-large {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .input-large {
+            height: 50px;
+            font-size: 1.1rem;
+        }
+
+        .btn-lg {
+            font-size: 1.2rem;
+            padding: 15px;
+        }
+    </style>
 {% endblock %}
