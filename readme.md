@@ -24,7 +24,7 @@ Este é um projeto desenvolvido usando **Django**, focado na transmissão de par
 
 1. Clone o repositório:
     ```bash
-    git clone <URL_DO_REPOSITORIO>
+    git clone "https://github.com/Reis567/django-futebol"
     ```
 2. Instale as dependências:
     ```bash
