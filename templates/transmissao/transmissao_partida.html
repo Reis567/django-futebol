@@ -94,13 +94,13 @@
                 <h2>Partida Finalizada</h2>
             </div>
         {% else %}
-            <div class="periodo" id="periodo">{{ periodo_atual }}</div> <!-- Exibir o período apenas se não estiver finalizada -->
+            <div class="periodo" id="periodo">1T</div> <!-- Exibir o período apenas se não estiver finalizada -->
             <div class="placar">
                 <h1>
                     {{ partida.time_casa.sigla }}
                     <span class="placar-casa">{{ partida.placar_casa }}</span>
                 </h1>
-                <div class="cronometro" id="cronometro">{{ cronometro_atual }}</div> <!-- Exibir o cronômetro apenas se não estiver finalizada -->
+                <div class="cronometro" id="cronometro">00:00</div> <!-- Exibir o cronômetro apenas se não estiver finalizada -->
                 <h1>
                     <span class="placar-visitante">{{ partida.placar_visitante }}</span>
                     {{ partida.time_visitante.sigla }}
