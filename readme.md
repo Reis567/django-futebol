@@ -1,6 +1,6 @@
 # Sistema de Transmissão de Partidas
 
-![Sistema de Transmissão](image.jpg)
+![Sistema de Transmissão](image.JPG)
 
 ## Descrição
 
